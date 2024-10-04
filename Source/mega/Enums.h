@@ -6,3 +6,18 @@ enum class ECharacterState : uint8 {
 	Jogging,
 	Crouching,
 };
+
+UENUM(BlueprintType)
+enum class ELocomotionDirections : uint8 {
+	Forward,
+	Backward,
+	Left,
+	Right,
+};
+
+UENUM(BlueprintType)
+enum class ERootYawOffsetMode : uint8 {
+	Accumulate,
+	BlendOut,
+	Hold
+};

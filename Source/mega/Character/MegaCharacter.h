@@ -2,8 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputAction.h"
+#include "CoreMinimal.h"
 #include "mega/Interfaces/AnimationInterface.h"
 #include "MegaCharacter.generated.h"
+
+class UInputAction;
+class UInputMappingContext;
 
 UCLASS()
 class MEGA_API AMegaCharacter : public ACharacter, public IAnimationInterface {
@@ -13,6 +19,17 @@ public:
 	AMegaCharacter();
 	void SetWalkState();
 	void SetJogState();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputMappingContext* DefaultMappingContext;
+
+	void AddMappingContext();
+
+	void Move(const FInputActionValue& Value);
+	
 
 protected:
 	virtual void BeginPlay() override;
