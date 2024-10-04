@@ -5,6 +5,7 @@
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/LocalPlayer.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "mega/Interfaces/AnimationInterface.h"
 
 AMegaCharacter::AMegaCharacter() {
@@ -42,6 +43,7 @@ void AMegaCharacter::SetWalkState() {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if(AnimInstance && AnimInstance->Implements<UAnimationInterface>()) {
 		IAnimationInterface::Execute_UpdateCharacterState(AnimInstance, ECharacterState::Walking);
+		CurrentState = ECharacterState::Walking;
 	}
 }
 
@@ -49,7 +51,41 @@ void AMegaCharacter::SetJogState() {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if(AnimInstance && AnimInstance->Implements<UAnimationInterface>()) {
 		IAnimationInterface::Execute_UpdateCharacterState(AnimInstance, ECharacterState::Jogging);
+		CurrentState = ECharacterState::Jogging;
 	}
+}
+
+void AMegaCharacter::SetCharacterStates() {
+	FCharacterSettings JoggingSettings;
+	JoggingSettings.MaxWalkSpeed = 800.f;
+	JoggingSettings.MaxAcceleration = 800.f;
+	JoggingSettings.BrakingDeceleration = 1200.f;
+	JoggingSettings.BrakingFrictionFactor = 1.0f;
+	JoggingSettings.BrakingFriction = 0.0f;
+	JoggingSettings.bUseSeparateBrakingFriction = true;
+
+	FCharacterSettings WalkingSettings;
+	WalkingSettings.MaxWalkSpeed = 250.f;
+	WalkingSettings.MaxAcceleration = 250.f;
+	WalkingSettings.BrakingDeceleration = 1000.f;
+	WalkingSettings.BrakingFrictionFactor = 1.0f;
+	WalkingSettings.BrakingFriction = 0.0f;
+	WalkingSettings.bUseSeparateBrakingFriction = true;
+
+	StateSettingsMap.Add(ECharacterState::Jogging, JoggingSettings);
+	StateSettingsMap.Add(ECharacterState::Walking, WalkingSettings);
+}
+
+void AMegaCharacter::UpdateCharacterStateWithSettings(ECharacterState NewState) {
+
+	FCharacterSettings NewSettings = StateSettingsMap[NewState];
+
+	GetCharacterMovement()->MaxWalkSpeed = NewSettings.MaxWalkSpeed;
+	GetCharacterMovement()->MaxAcceleration = NewSettings.MaxAcceleration;
+	GetCharacterMovement()->BrakingDecelerationWalking = NewSettings.BrakingDeceleration;
+	GetCharacterMovement()->BrakingFrictionFactor = NewSettings.BrakingFrictionFactor;
+	GetCharacterMovement()->BrakingFriction = NewSettings.BrakingFriction;
+	GetCharacterMovement()->bUseSeparateBrakingFriction = NewSettings.bUseSeparateBrakingFriction;
 }
 
 

@@ -20,6 +20,18 @@ public:
 	void SetWalkState();
 	void SetJogState();
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterState")
+	ECharacterState CurrentState = ECharacterState::Walking;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gate Settings")
+	TMap<ECharacterState, FCharacterSettings> StateSettingsMap;
+
+	UFUNCTION(BlueprintCallable)
+	void SetCharacterStates();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateCharacterStateWithSettings(ECharacterState NewState);
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* MoveAction;
 
