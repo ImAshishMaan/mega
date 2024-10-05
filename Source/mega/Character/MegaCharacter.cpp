@@ -36,6 +36,7 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	if(UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Move);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Look);
 	}
 }
 
@@ -55,7 +56,7 @@ void AMegaCharacter::SetJogState() {
 	}
 }
 
-void AMegaCharacter::SetCharacterStates() {
+void AMegaCharacter:: SetCharacterStates() {
 	FCharacterSettings JoggingSettings;
 	JoggingSettings.MaxWalkSpeed = 800.f;
 	JoggingSettings.MaxAcceleration = 800.f;
@@ -86,6 +87,12 @@ void AMegaCharacter::UpdateCharacterStateWithSettings(ECharacterState NewState) 
 	GetCharacterMovement()->BrakingFrictionFactor = NewSettings.BrakingFrictionFactor;
 	GetCharacterMovement()->BrakingFriction = NewSettings.BrakingFriction;
 	GetCharacterMovement()->bUseSeparateBrakingFriction = NewSettings.bUseSeparateBrakingFriction;
+	
+	if(NewState == ECharacterState::Jogging) {
+		SetJogState();
+	} else if(NewState == ECharacterState::Walking) {
+		SetWalkState();
+	}
 }
 
 
@@ -102,4 +109,13 @@ void AMegaCharacter::Move(const FInputActionValue& Value) {
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
 	}
+}
+
+void AMegaCharacter::Look(const FInputActionValue& Value) {
+
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	AddControllerYawInput(LookAxisVector.X);
+	AddControllerPitchInput(LookAxisVector.Y);
+	
 }

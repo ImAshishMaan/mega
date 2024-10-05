@@ -36,11 +36,15 @@ public:
 	UInputAction* MoveAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	void AddMappingContext();
 
 	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
 	
 
 protected:

@@ -105,53 +105,52 @@ void UMegaAnimInstance::SetLocomotionData() {
 
 ELocomotionDirections UMegaAnimInstance::CalculateLocomotionDirection(float CurrentLocomotionAngle, float BackwardMin,
 	float BackwardMax, float ForwardMin, float ForwardMax, ELocomotionDirections CurrentDirection, float DeadZone) {
+
+	ELocomotionDirections Direction = ELocomotionDirections::Forward;
 	switch(CurrentDirection) {
 		case ELocomotionDirections::Forward: {
 			bool InForwardRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (ForwardMin - DeadZone), (ForwardMax + DeadZone));
 			if(InForwardRange) {
-				return ELocomotionDirections::Forward;
+				Direction = ELocomotionDirections::Forward;
 			}
-			break;
 		}
 
 		case ELocomotionDirections::Backward: {
 			if(CurrentLocomotionAngle < (BackwardMin - DeadZone) || CurrentLocomotionAngle > (BackwardMax - DeadZone)) {
-				return ELocomotionDirections::Backward;
+				Direction = ELocomotionDirections::Backward;
 			}
-			break;
 		}
 
 		case ELocomotionDirections::Right: {
 			bool InRightRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (ForwardMin - DeadZone), (BackwardMax + DeadZone));
 			if(InRightRange) {
-				return ELocomotionDirections::Right;
+				Direction = ELocomotionDirections::Right;
 			}
-			break;
 		}
 
 		case ELocomotionDirections::Left: {
 			bool InLeftRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (BackwardMin - DeadZone), (ForwardMax + DeadZone));
 			if(InLeftRange) {
-				return ELocomotionDirections::Left;
+				Direction = ELocomotionDirections::Left;
 			}
-			break;
 		}
 	}
 
 	if(CurrentLocomotionAngle < BackwardMin || CurrentLocomotionAngle > BackwardMax) {
-		return ELocomotionDirections::Backward;
+		Direction = ELocomotionDirections::Backward;
 	} else {
 		bool InRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, ForwardMin, ForwardMax);
 		if(InRange) {
-			return ELocomotionDirections::Forward;
+			Direction = ELocomotionDirections::Forward;
 		}else {
 			if(CurrentLocomotionAngle > 0.f) {
-				return ELocomotionDirections::Right;
+				Direction = ELocomotionDirections::Right;
 			}else {
-				return ELocomotionDirections::Left;
+				Direction = ELocomotionDirections::Left;
 			}
 		}
 	}
+	return Direction;
 }
 
 void UMegaAnimInstance::SetRootYawOffset(float DeltaTime) {
