@@ -23,10 +23,10 @@ void UMegaAnimInstance::NativeUpdateAnimation(float DeltaSeconds) {
 
 	SetCharacterMovement();
 	SetVelocityData();
-	SetCharacterStates();
 	SetAccelerationData();
 	SetLocationData(DeltaSeconds);
 	SetLocomotionData();
+	SetCharacterStates();
 }
 
 void UMegaAnimInstance::SetVelocityData() {
@@ -82,7 +82,7 @@ void UMegaAnimInstance::SetLocationData(float DeltaTime) {
 	
 	// NOTE: This might not work
 	/*
-	 * 
+	 *  Lean Angle
 	 */
 	const float Target = DeltaActorYaw / DeltaTime;
 	const float Interp = FMath::FInterpTo(LeanAngle, Target, DeltaTime, 6.f);
@@ -96,7 +96,6 @@ void UMegaAnimInstance::SetLocomotionData() {
 
 	AccelerationLocomotionAngle = CalculateDirection(Acceleration2D, WorldRotation);
 
-
 	/*
 	 * Calculate Locomotion Direction 
 	 */
@@ -106,42 +105,47 @@ void UMegaAnimInstance::SetLocomotionData() {
 
 ELocomotionDirections UMegaAnimInstance::CalculateLocomotionDirection(float CurrentLocomotionAngle, float BackwardMin,
 	float BackwardMax, float ForwardMin, float ForwardMax, ELocomotionDirections CurrentDirection, float DeadZone) {
-
-	if(CurrentDirection == ELocomotionDirections::Forward) {
-		bool InRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (ForwardMin - DeadZone), (ForwardMax + DeadZone));
-		if(InRange) {
-			return ELocomotionDirections::Forward;
+	switch(CurrentDirection) {
+		case ELocomotionDirections::Forward: {
+			bool InForwardRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (ForwardMin - DeadZone), (ForwardMax + DeadZone));
+			if(InForwardRange) {
+				return ELocomotionDirections::Forward;
+			}
+			break;
 		}
-	}
 
-	if(CurrentDirection == ELocomotionDirections::Backward) {
-		if(CurrentLocomotionAngle < (BackwardMin - DeadZone) || CurrentLocomotionAngle > (BackwardMax - DeadZone)) {
-			return ELocomotionDirections::Backward;
+		case ELocomotionDirections::Backward: {
+			if(CurrentLocomotionAngle < (BackwardMin - DeadZone) || CurrentLocomotionAngle > (BackwardMax - DeadZone)) {
+				return ELocomotionDirections::Backward;
+			}
+			break;
 		}
-	}
 
-	if(CurrentDirection == ELocomotionDirections::Right) {
-		bool InRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (ForwardMin - DeadZone), (BackwardMax + DeadZone));
-		if(InRange) {
-			return ELocomotionDirections::Right;
+		case ELocomotionDirections::Right: {
+			bool InRightRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (ForwardMin - DeadZone), (BackwardMax + DeadZone));
+			if(InRightRange) {
+				return ELocomotionDirections::Right;
+			}
+			break;
 		}
-	}
-	
-	if(CurrentDirection == ELocomotionDirections::Left) {
-		bool InRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (BackwardMin - DeadZone), (ForwardMax + DeadZone));
-		if(InRange) {
-			return ELocomotionDirections::Left;
+
+		case ELocomotionDirections::Left: {
+			bool InLeftRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (BackwardMin - DeadZone), (ForwardMax + DeadZone));
+			if(InLeftRange) {
+				return ELocomotionDirections::Left;
+			}
+			break;
 		}
 	}
 
 	if(CurrentLocomotionAngle < BackwardMin || CurrentLocomotionAngle > BackwardMax) {
 		return ELocomotionDirections::Backward;
-	}else {
-		bool InRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (ForwardMin), (ForwardMax));
+	} else {
+		bool InRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, ForwardMin, ForwardMax);
 		if(InRange) {
 			return ELocomotionDirections::Forward;
 		}else {
-			if(CurrentLocomotionAngle > 0) {
+			if(CurrentLocomotionAngle > 0.f) {
 				return ELocomotionDirections::Right;
 			}else {
 				return ELocomotionDirections::Left;
@@ -167,6 +171,7 @@ void UMegaAnimInstance::SetRootYawOffset(float DeltaTime) {
 
 // call from BP
 void UMegaAnimInstance::ProcessTurnYawCurve(float DeltaTime) {
+	RootYawOffsetMode = ERootYawOffsetMode::Accumulate;
 	LastFrameTurnYawCurveValue = TurnYawCurveValue;
 
 	if(GetCurveValue("IsTurning") < 1.f) {
