@@ -106,32 +106,32 @@ void UMegaAnimInstance::SetLocomotionData() {
 ELocomotionDirections UMegaAnimInstance::CalculateLocomotionDirection(float CurrentLocomotionAngle, float BackwardMin,
 	float BackwardMax, float ForwardMin, float ForwardMax, ELocomotionDirections CurrentDirection, float DeadZone) {
 
-	ELocomotionDirections Direction = ELocomotionDirections::Forward;
+	ELocomotionDirections Direction;
 	switch(CurrentDirection) {
 		case ELocomotionDirections::Forward: {
 			bool InForwardRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (ForwardMin - DeadZone), (ForwardMax + DeadZone));
 			if(InForwardRange) {
-				Direction = ELocomotionDirections::Forward;
+				return ELocomotionDirections::Forward;
 			}
 		}
 
 		case ELocomotionDirections::Backward: {
 			if(CurrentLocomotionAngle < (BackwardMin - DeadZone) || CurrentLocomotionAngle > (BackwardMax - DeadZone)) {
-				Direction = ELocomotionDirections::Backward;
+				return ELocomotionDirections::Backward;
 			}
 		}
 
 		case ELocomotionDirections::Right: {
-			bool InRightRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (ForwardMin - DeadZone), (BackwardMax + DeadZone));
+			bool InRightRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (ForwardMax - DeadZone), (BackwardMax + DeadZone));
 			if(InRightRange) {
-				Direction = ELocomotionDirections::Right;
+				return ELocomotionDirections::Right;
 			}
 		}
 
 		case ELocomotionDirections::Left: {
-			bool InLeftRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (BackwardMin - DeadZone), (ForwardMax + DeadZone));
+			bool InLeftRange = UKismetMathLibrary::InRange_FloatFloat(CurrentLocomotionAngle, (BackwardMin - DeadZone), (ForwardMin + DeadZone));
 			if(InLeftRange) {
-				Direction = ELocomotionDirections::Left;
+				return ELocomotionDirections::Left;
 			}
 		}
 	}
