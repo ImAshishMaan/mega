@@ -80,13 +80,13 @@ void UMegaAnimInstance::SetLocationData(float DeltaTime) {
 	DeltaActorYaw = ActorYaw - LastFrameActorYaw;
 
 	
-	// NOTE: This might not work
 	/*
 	 *  Lean Angle
 	 */
 	const float Target = DeltaActorYaw / DeltaTime;
 	const float Interp = FMath::FInterpTo(LeanAngle, Target, DeltaTime, 6.f);
 	LeanAngle = FMath::Clamp(Interp, -90.f, 90.f);
+	
 }
 
 void UMegaAnimInstance::SetLocomotionData() {
