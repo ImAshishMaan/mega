@@ -66,7 +66,7 @@ void UMegaAnimInstance::SetAccelerationData() {
 	Acceleration2D = FVector(Acceleration.X, Acceleration.Y, 0.0f);
 	IsAccelerating = !(FMath::IsNearlyZero(Acceleration2D.Size()));
 	
-	PivotAcceleration2D = Acceleration2D;
+	//PivotAcceleration2D is set in Pivot state when pivot state become active 
 }
 
 void UMegaAnimInstance::SetLocationData(float DeltaTime) {
