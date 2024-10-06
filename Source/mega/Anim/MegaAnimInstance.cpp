@@ -31,6 +31,7 @@ void UMegaAnimInstance::NativeUpdateAnimation(float DeltaSeconds) {
 	SetLocationData(DeltaSeconds);
 	SetLocomotionData();
 	SetCharacterStates();
+	SetRootYawOffset(DeltaSeconds);
 }
 
 void UMegaAnimInstance::SetVelocityData() {
@@ -159,11 +160,12 @@ ELocomotionDirections UMegaAnimInstance::CalculateLocomotionDirection(float Curr
 
 void UMegaAnimInstance::SetRootYawOffset(float DeltaTime) {
 	if(RootYawOffsetMode == ERootYawOffsetMode::Accumulate) {
-		float Target = RootYawOffset + (DeltaActorYaw * -1);
+		float Target = RootYawOffset - DeltaActorYaw;
 		RootYawOffset = UKismetMathLibrary::NormalizeAxis(Target);
 	}
 
 	if(RootYawOffsetMode == ERootYawOffsetMode::BlendOut) {
+		// Lerp to zero if mode is blend out
 		float Target = UKismetMathLibrary::FloatSpringInterp(RootYawOffset, 0.f, RootYawOffsetSpringState, 80.f, 1.f,
 		                                                     DeltaTime);
 		RootYawOffset = UKismetMathLibrary::NormalizeAxis(Target);
@@ -172,7 +174,9 @@ void UMegaAnimInstance::SetRootYawOffset(float DeltaTime) {
 	RootYawOffsetMode = ERootYawOffsetMode::BlendOut;
 }
 
-// call from BP
+
+
+// TODO: Implemented same in bp need to figure out how to use this instead of be function
 void UMegaAnimInstance::ProcessTurnYawCurve(float DeltaTime) {
 	RootYawOffsetMode = ERootYawOffsetMode::Accumulate;
 	LastFrameTurnYawCurveValue = TurnYawCurveValue;

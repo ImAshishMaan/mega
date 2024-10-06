@@ -89,8 +89,17 @@ void AMegaCharacter:: SetCharacterStates() {
 	WalkingSettings.BrakingFriction = 0.0f;
 	WalkingSettings.bUseSeparateBrakingFriction = true;
 
+	FCharacterSettings CrouchingSettings;
+	CrouchingSettings.MaxWalkSpeed = 250.f;
+	CrouchingSettings.MaxAcceleration = 250.f;
+	CrouchingSettings.BrakingDeceleration = 1000.f;
+	CrouchingSettings.BrakingFrictionFactor = 1.0f;
+	CrouchingSettings.BrakingFriction = 0.0f;
+	CrouchingSettings.bUseSeparateBrakingFriction = true;
+
 	StateSettingsMap.Add(ECharacterState::Jogging, JoggingSettings);
 	StateSettingsMap.Add(ECharacterState::Walking, WalkingSettings);
+	StateSettingsMap.Add(ECharacterState::Crouching, CrouchingSettings);
 }
 
 void AMegaCharacter::UpdateCharacterStateWithSettings(ECharacterState NewState) {

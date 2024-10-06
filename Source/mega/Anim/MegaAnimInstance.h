@@ -140,7 +140,7 @@ public:
 	float RootYawOffset;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RootYawOffset")
-	ERootYawOffsetMode RootYawOffsetMode;
+	ERootYawOffsetMode RootYawOffsetMode = ERootYawOffsetMode::Accumulate;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RootYawOffset")
 	FFloatSpringState RootYawOffsetSpringState;
@@ -153,7 +153,7 @@ public:
 
 	void SetRootYawOffset(float DeltaTime);
 
-	UFUNCTION(BlueprintCallable)
+	//UFUNCTION(BlueprintCallable)
 	void ProcessTurnYawCurve(float DeltaTime);
 
 	/*
