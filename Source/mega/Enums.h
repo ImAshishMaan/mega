@@ -4,6 +4,12 @@
 #include "Enums.generated.h"
 
 UENUM(BlueprintType)
+enum class EEquipped : uint8 {
+	UnEquipped = 0,
+	Rifle = 1
+};
+
+UENUM(BlueprintType)
 enum class ECharacterState : uint8 {
 	Walking,
 	Jogging,

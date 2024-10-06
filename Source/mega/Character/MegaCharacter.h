@@ -19,10 +19,28 @@ public:
 	AMegaCharacter();
 	void SetWalkState();
 	void SetJogState();
+	void SetCrouchState();
 	void SetGroundDistance();
 
+	/*
+	 * Animation Layers Data 
+	 */
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AnimLayers")
+	EEquipped CurrentEquipped = EEquipped::UnEquipped;
+	EEquipped LastEquipped = EEquipped::Rifle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AnimLayers")
+	TMap<EEquipped, TSubclassOf<UAnimInstance>> AnimInstanceMap;
+
+	void SetAnimLayer();
+
+	/*
+	 * 
+	 */
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterState")
-	ECharacterState CurrentState = ECharacterState::Walking;
+	ECharacterState CurrentState = ECharacterState::Jogging;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gate Settings")
 	TMap<ECharacterState, FCharacterSettings> StateSettingsMap;
@@ -40,12 +58,17 @@ public:
 	UInputAction* LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* JumpAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	void AddMappingContext();
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void StartJumping();
+	virtual void StopJumping() override;
 	
 
 protected:
