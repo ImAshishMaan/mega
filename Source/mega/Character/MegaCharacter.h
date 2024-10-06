@@ -19,6 +19,7 @@ public:
 	AMegaCharacter();
 	void SetWalkState();
 	void SetJogState();
+	void SetGroundDistance();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterState")
 	ECharacterState CurrentState = ECharacterState::Walking;

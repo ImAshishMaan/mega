@@ -19,6 +19,7 @@ public:
 	//virtual void NativeThreadSafeUpdateAnimation(float DeltaSeconds) override;
 
 	virtual void UpdateCharacterState_Implementation(ECharacterState NewState);
+	virtual void GroundDistance_Implementation(float CurrentGroundDistance);
 
 	/*
 	 * Velocity Data
@@ -186,6 +187,10 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Jump")
 	float GroundDistance;
+
+	/*
+	 * Neet to implement ground distance
+	 */
 
 private:
 	AMegaCharacter* OwnerCharacter = nullptr;

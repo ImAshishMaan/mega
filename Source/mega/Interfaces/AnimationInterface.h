@@ -21,5 +21,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Animation")
 	void UpdateCharacterState(ECharacterState NewState);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Animation")
+	void GroundDistance(float CurrentGroundDistance);
+
 public:
 };

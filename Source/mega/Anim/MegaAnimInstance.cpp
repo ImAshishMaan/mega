@@ -7,6 +7,10 @@ void UMegaAnimInstance::UpdateCharacterState_Implementation(ECharacterState NewS
 	IncomingState = NewState;
 }
 
+void UMegaAnimInstance::GroundDistance_Implementation(float CurrentGroundDistance) {
+	GroundDistance = CurrentGroundDistance;
+}
+
 void UMegaAnimInstance::NativeUpdateAnimation(float DeltaSeconds) {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	if(OwnerCharacter == nullptr) {
@@ -50,7 +54,7 @@ void UMegaAnimInstance::SetCharacterStates() {
 	CrouchStateChange = IsCrouching != LastFrameIsCrouching;
 
 	//Jump
-	IsOnAir = OwnerMovementComponent->MovementMode == EMovementMode::MOVE_Flying ? true : false;
+	IsOnAir = OwnerMovementComponent->MovementMode == EMovementMode::MOVE_Falling ? true : false;
 	IsJumping = IsOnAir && CharacterVelocity.Z > 0;
 	IsFalling = IsOnAir && CharacterVelocity.Z < 0;
 	if(IsJumping) {

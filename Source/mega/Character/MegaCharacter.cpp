@@ -2,6 +2,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "Animation/AnimInstance.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/LocalPlayer.h"
@@ -55,6 +56,21 @@ void AMegaCharacter::SetJogState() {
 		CurrentState = ECharacterState::Jogging;
 	}
 }
+
+void AMegaCharacter::SetGroundDistance() {
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && AnimInstance->Implements<UAnimationInterface>()) {
+		FVector start = GetActorLocation() - (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * FVector(0.f, 0.f, 1.f));
+		FVector end = GetActorLocation() * FVector(0.f, 0.f, 1000.f);
+		FHitResult hit;
+		bool OnHit = GetWorld()->LineTraceSingleByChannel(hit, start, end, ECollisionChannel::ECC_Visibility);
+		if(OnHit) {
+			IAnimationInterface::Execute_GroundDistance(AnimInstance, hit.Distance);
+		}
+	}
+}
+
+
 
 void AMegaCharacter:: SetCharacterStates() {
 	FCharacterSettings JoggingSettings;
