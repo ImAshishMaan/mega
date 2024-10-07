@@ -6,6 +6,7 @@
 #include "CombatComponent.generated.h"
 
 
+class AWeapon;
 class UCharacterMovementComponent;
 class AMegaHUD;
 class AMegaPlayerController;
@@ -20,10 +21,14 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
+	void SetGroundDistance();
+	/*
+	 * Character States
+	 */
+
 	void SetWalkState();
 	void SetJogState();
 	void SetCrouchState();
-	void SetGroundDistance();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterState")
 	ECharacterState CurrentState = ECharacterState::Jogging;
@@ -51,8 +56,9 @@ public:
 	void SetAnimLayer();
 
 	/*
-	 * 
+	 * Equip Weapon
 	 */
+	void EquipWeapon(AWeapon* WeaponToEquip);
 
 protected:
 	virtual void BeginPlay() override;
@@ -70,6 +76,9 @@ private:
 
 	/*UPROPERTY()
 	AMegaHUD* MegaHUD;*/
+
+	UPROPERTY()
+	AWeapon* EquippedWeapon;
 
 	
 };

@@ -41,6 +41,9 @@ public:
 	UInputAction* CrouchAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* EquipAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	void AddMappingContext();
@@ -52,6 +55,7 @@ public:
 	void Crouch();
 	void StartJumping();
 	virtual void StopJumping() override;
+	void Equip();
 	
 
 protected:
@@ -65,8 +69,6 @@ public:
 private:
 	UPROPERTY()
 	AWeapon* OverlappingWeapon;
-
-
 
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);

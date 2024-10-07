@@ -1,10 +1,12 @@
 #include "CombatComponent.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "mega/Enums.h"
 #include "mega/Character/MegaCharacter.h"
 #include "mega/Interfaces/AnimationInterface.h"
+#include "mega/Weapon/Weapon.h"
 
 UCombatComponent::UCombatComponent() {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -122,4 +124,23 @@ void UCombatComponent::SetAnimLayer() {
 		UpdateCharacterStateWithSettings(CurrentState);
 		LastEquipped = CurrentEquipped;
 	}
+}
+
+void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip) {
+	if(WeaponToEquip == nullptr) return;
+
+	EquippedWeapon = WeaponToEquip;
+	// Attach to actor;
+	const USkeletalMeshSocket* Socket = MegaCharacter->GetMesh()->GetSocketByName("RightHandSocket");
+	if(Socket) {
+		Socket->AttachActor(EquippedWeapon, MegaCharacter->GetMesh());
+	}
+
+	EquippedWeapon->SetOwner(MegaCharacter);
+	// call Set hud weapon ammo in weapon class
+	// call set Hud carried ammo in player controller class
+	
+
+
+	// Play equip sound from weapon class
 }

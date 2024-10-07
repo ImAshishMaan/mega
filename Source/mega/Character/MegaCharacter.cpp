@@ -51,6 +51,7 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Triggered, this, &AMegaCharacter::StartWalking);
 		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Completed, this, &AMegaCharacter::StopWalking);
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Crouch);
+		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Equip);
 	}
 }
 
@@ -109,4 +110,12 @@ void AMegaCharacter::StartJumping() {
 
 void AMegaCharacter::StopJumping() {
 	Super::StopJumping();
+}
+
+void AMegaCharacter::Equip() {
+	if(OverlappingWeapon) {
+		if(CombatComponent) {
+			CombatComponent->EquipWeapon(OverlappingWeapon);
+		}
+	}
 }
