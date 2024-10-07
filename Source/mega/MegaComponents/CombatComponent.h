@@ -47,13 +47,12 @@ public:
 	 */
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AnimLayers")
-	EEquipped CurrentEquipped = EEquipped::UnEquipped;
 	EEquipped LastEquipped = EEquipped::MaxDefault;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AnimLayers")
 	TMap<EEquipped, TSubclassOf<UAnimInstance>> AnimInstanceMap;
 
-	void SetAnimLayer();
+	void SetAnimLayer(EEquipped CurrentEquipped);
 
 	/*
 	 * Equip Weapon

@@ -7,8 +7,9 @@ UENUM(BlueprintType)
 enum class EEquipped : uint8 {
 	UnEquipped = 0,
 	Rifle = 1,
+	Pistol = 2,
 
-	MaxDefault = 2
+	MaxDefault = 3
 };
 
 UENUM(BlueprintType)

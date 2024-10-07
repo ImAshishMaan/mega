@@ -115,6 +115,7 @@ void AMegaCharacter::StopJumping() {
 void AMegaCharacter::Equip() {
 	if(OverlappingWeapon) {
 		if(CombatComponent) {
+			CombatComponent->SetAnimLayer(EEquipped::Rifle);
 			CombatComponent->EquipWeapon(OverlappingWeapon);
 		}
 	}

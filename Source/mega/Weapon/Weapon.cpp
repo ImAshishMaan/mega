@@ -40,7 +40,7 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	
 	AMegaCharacter* MegaCharacter = Cast<AMegaCharacter>(OtherActor);
 	if(MegaCharacter) {
-		MegaCharacter->SetOverlappingWeapon(this);
+		MegaCharacter->SetOverlappingWeapon(nullptr);
 	}
 }
 

@@ -18,8 +18,9 @@ void UCombatComponent::BeginPlay() {
 	if(MegaCharacter)
 		MegaMovementComponent = MegaCharacter->GetCharacterMovement();
 
-	// call this from character class with layer in parameters
-	SetAnimLayer();
+	SetCharacterStates();
+	UpdateCharacterStateWithSettings(CurrentState);
+	SetAnimLayer(EEquipped::UnEquipped);
 }
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -116,12 +117,10 @@ void UCombatComponent::UpdateCharacterStateWithSettings(ECharacterState NewState
 }
 
 
-void UCombatComponent::SetAnimLayer() {
+void UCombatComponent::SetAnimLayer(EEquipped CurrentEquipped) {
 	if(CurrentEquipped != LastEquipped) {
 		TMap<EEquipped, TSubclassOf<UAnimInstance>>::ValueType instance = AnimInstanceMap[CurrentEquipped];
 		MegaCharacter->GetMesh()->LinkAnimClassLayers(instance);
-		SetCharacterStates();
-		UpdateCharacterStateWithSettings(CurrentState);
 		LastEquipped = CurrentEquipped;
 	}
 }

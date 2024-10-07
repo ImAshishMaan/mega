@@ -61,5 +61,8 @@ private:
 	int32 MagCapacity = 30;
 
 	void SpendRound();
+
+public:
+	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	
 };
