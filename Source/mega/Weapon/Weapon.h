@@ -17,6 +17,12 @@ public:
 
 	virtual void Fire(const FVector& HitTarget);
 
+	/*
+	 * Automatic Fire
+	 */
+	UPROPERTY(EditAnywhere, Category = "Fire")
+	float FireDelay = 0.1f;
+
 protected:
 	virtual void BeginPlay() override;
 

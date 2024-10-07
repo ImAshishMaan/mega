@@ -85,6 +85,13 @@ private:
 
 	bool bFireButtonPressed;
 
+	/*
+	 * Automatic Fire
+	 */
+	FTimerHandle FireTimer;
+	bool bCanFire = true;
+	void StartFireTimer();
+	void FireTimerFinished();
 	bool CanFire();
 
 	// Target that are under crosshair live

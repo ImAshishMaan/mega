@@ -158,16 +158,33 @@ void UCombatComponent::FireButtonPressed(bool bPressed) {
 	}
 }
 
+
 bool UCombatComponent::CanFire() {
 	if(EquippedWeapon == nullptr) return false;
-	return true;
+	return bCanFire;
 }
 
 void UCombatComponent::Fire() {
 	if(CanFire()) {
-		if(EquippedWeapon) {
-			EquippedWeapon->Fire(HitTarget);
-		}
+		bCanFire = false;
+		EquippedWeapon->Fire(HitTarget);
+		StartFireTimer();
+	}
+}
+
+void UCombatComponent::StartFireTimer() {
+	GetWorld()->GetTimerManager().SetTimer(
+		FireTimer,
+		this,
+		&UCombatComponent::FireTimerFinished,
+		EquippedWeapon->FireDelay
+	);
+}
+
+void UCombatComponent::FireTimerFinished() {
+	bCanFire = true;
+	if(bFireButtonPressed) {
+		Fire();
 	}
 }
 
@@ -202,6 +219,5 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult) {
 			End,
 			ECollisionChannel::ECC_Visibility
 		);
-		
 	}
 }
