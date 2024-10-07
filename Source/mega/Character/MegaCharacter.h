@@ -44,6 +44,9 @@ public:
 	UInputAction* EquipAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* FireAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	void AddMappingContext();
@@ -56,6 +59,8 @@ public:
 	void StartJumping();
 	virtual void StopJumping() override;
 	void Equip();
+	void FireButtonPressed();
+	void FireButtonReleased();
 	
 
 protected:

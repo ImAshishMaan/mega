@@ -52,6 +52,8 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Completed, this, &AMegaCharacter::StopWalking);
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Crouch);
 		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Equip);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AMegaCharacter::FireButtonPressed);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AMegaCharacter::FireButtonReleased);
 	}
 }
 
@@ -118,5 +120,16 @@ void AMegaCharacter::Equip() {
 			CombatComponent->SetAnimLayer(EEquipped::Rifle);
 			CombatComponent->EquipWeapon(OverlappingWeapon);
 		}
+	}
+}
+
+void AMegaCharacter::FireButtonPressed() {
+	if(CombatComponent) {
+		CombatComponent->FireButtonPressed(true);
+	}
+}
+void AMegaCharacter::FireButtonReleased() {
+	if(CombatComponent) {
+		CombatComponent->FireButtonPressed(false);
 	}
 }

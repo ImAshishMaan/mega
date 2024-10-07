@@ -58,6 +58,10 @@ public:
 	 * Equip Weapon
 	 */
 	void EquipWeapon(AWeapon* WeaponToEquip);
+	void FireButtonPressed(bool bPressed);
+	void Fire();
+
+	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
 protected:
 	virtual void BeginPlay() override;
@@ -78,6 +82,13 @@ private:
 
 	UPROPERTY()
 	AWeapon* EquippedWeapon;
+
+	bool bFireButtonPressed;
+
+	bool CanFire();
+
+	// Target that are under crosshair live
+	FVector HitTarget;
 
 	
 };

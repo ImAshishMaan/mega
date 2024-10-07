@@ -3,6 +3,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "mega/Enums.h"
 #include "mega/Character/MegaCharacter.h"
 #include "mega/Interfaces/AnimationInterface.h"
@@ -15,17 +16,23 @@ UCombatComponent::UCombatComponent() {
 
 void UCombatComponent::BeginPlay() {
 	Super::BeginPlay();
-	if(MegaCharacter)
-		MegaMovementComponent = MegaCharacter->GetCharacterMovement();
+	if(MegaCharacter) MegaMovementComponent = MegaCharacter->GetCharacterMovement();
 
 	SetCharacterStates();
 	UpdateCharacterStateWithSettings(CurrentState);
 	SetAnimLayer(EEquipped::UnEquipped);
 }
 
+
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                      FActorComponentTickFunction* ThisTickFunction) {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if(MegaCharacter) {
+		FHitResult HitResult;
+		TraceUnderCrosshairs(HitResult);
+		HitTarget = HitResult.ImpactPoint;
+	}
 }
 
 void UCombatComponent::SetWalkState() {
@@ -55,7 +62,8 @@ void UCombatComponent::SetCrouchState() {
 void UCombatComponent::SetGroundDistance() {
 	UAnimInstance* AnimInstance = MegaCharacter->GetMesh()->GetAnimInstance();
 	if(AnimInstance && AnimInstance->Implements<UAnimationInterface>()) {
-		FVector start = MegaCharacter->GetActorLocation() - (MegaCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * FVector(
+		FVector start = MegaCharacter->GetActorLocation() - (MegaCharacter->GetCapsuleComponent()->
+		                                                                    GetScaledCapsuleHalfHeight() * FVector(
 			0.f, 0.f, 1.f));
 		FVector end = MegaCharacter->GetActorLocation() * FVector(0.f, 0.f, 1000.f);
 		FHitResult hit;
@@ -138,8 +146,62 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip) {
 	EquippedWeapon->SetOwner(MegaCharacter);
 	// call Set hud weapon ammo in weapon class
 	// call set Hud carried ammo in player controller class
-	
 
 
 	// Play equip sound from weapon class
+}
+
+void UCombatComponent::FireButtonPressed(bool bPressed) {
+	bFireButtonPressed = bPressed;
+	if(bFireButtonPressed) {
+		Fire();
+	}
+}
+
+bool UCombatComponent::CanFire() {
+	if(EquippedWeapon == nullptr) return false;
+	return true;
+}
+
+void UCombatComponent::Fire() {
+	if(CanFire()) {
+		if(EquippedWeapon) {
+			EquippedWeapon->Fire(HitTarget);
+		}
+	}
+}
+
+void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult) {
+	FVector2D ViewportSize;
+	if(GEngine && GEngine->GameViewport) {
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+
+	FVector2D CrosshairLocation(ViewportSize.X / 2.0f, ViewportSize.Y / 2.0f);
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrosshairLocation,
+		CrosshairWorldPosition,
+		CrosshairWorldDirection
+	);
+
+	if(bScreenToWorld) {
+		FVector Start = CrosshairWorldPosition;
+		if(MegaCharacter) {
+			float DistanceToCharacter = (MegaCharacter->GetActorLocation() - Start).Size();
+			// to start trace from front of character
+			Start += CrosshairWorldDirection * (DistanceToCharacter + 100.0f);
+			//DrawDebugSphere(GetWorld(), Start, 16.0f, 12, FColor::Red, false);
+		}
+		FVector End = Start + CrosshairWorldDirection * 80000.0f;
+		GetWorld()->LineTraceSingleByChannel(
+			TraceHitResult,
+			Start,
+			End,
+			ECollisionChannel::ECC_Visibility
+		);
+		
+	}
 }
