@@ -21,6 +21,12 @@ void AMegaCharacter::BeginPlay() {
 	
 }
 
+void AMegaCharacter::SetOverlappingWeapon(AWeapon* Weapon) {
+	if(Weapon) {
+		OverlappingWeapon = Weapon;
+	}
+}
+
 void AMegaCharacter::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 }

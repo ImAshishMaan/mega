@@ -51,4 +51,16 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* CombatComponent;
+
+private:
+	UPROPERTY()
+	AWeapon* OverlappingWeapon;
+
+
+
+public:
+	void SetOverlappingWeapon(AWeapon* Weapon);
+
+
+	
 };
