@@ -1,16 +1,17 @@
 #include "MegaCharacter.h"
-
 #include "EnhancedInputComponent.h"
 #include "Animation/AnimInstance.h"
-#include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/LocalPlayer.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "mega/Interfaces/AnimationInterface.h"
+#include "mega/MegaComponents/CombatComponent.h"
+#include "mega/PlayerController/MegaPlayerController.h"
 
 AMegaCharacter::AMegaCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
+
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	
 }
 
 
@@ -22,19 +23,7 @@ void AMegaCharacter::BeginPlay() {
 
 void AMegaCharacter::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-	SetAnimLayer();
 }
-
-void AMegaCharacter::SetAnimLayer() {
-	if(CurrentEquipped != LastEquipped) {
-		TMap<EEquipped, TSubclassOf<UAnimInstance>>::ValueType instance = AnimInstanceMap[CurrentEquipped];
-		GetMesh()->LinkAnimClassLayers(instance);
-		SetCharacterStates();
-		UpdateCharacterStateWithSettings(CurrentState);
-		LastEquipped = CurrentEquipped;
-	}
-}
-
 
 void AMegaCharacter::AddMappingContext() {
 	if(APlayerController* PlayerController = Cast<APlayerController>(GetController())) {
@@ -56,95 +45,14 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	}
 }
 
-void AMegaCharacter::SetWalkState() {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance && AnimInstance->Implements<UAnimationInterface>()) {
-		IAnimationInterface::Execute_UpdateCharacterState(AnimInstance, ECharacterState::Walking);
-		CurrentState = ECharacterState::Walking;
+void AMegaCharacter::PostInitializeComponents() {
+	Super::PostInitializeComponents();
+
+	if(CombatComponent) {
+		CombatComponent->MegaCharacter = this;
+		CombatComponent->MegaPlayerController = Cast<AMegaPlayerController>(GetController());
 	}
 }
-
-void AMegaCharacter::SetJogState() {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance && AnimInstance->Implements<UAnimationInterface>()) {
-		IAnimationInterface::Execute_UpdateCharacterState(AnimInstance, ECharacterState::Jogging);
-		CurrentState = ECharacterState::Jogging;
-	}
-}
-
-void AMegaCharacter::SetCrouchState() {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance && AnimInstance->Implements<UAnimationInterface>()) {
-		IAnimationInterface::Execute_UpdateCharacterState(AnimInstance, ECharacterState::Crouching);
-		CurrentState = ECharacterState::Crouching;
-	}
-}
-
-void AMegaCharacter::SetGroundDistance() {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance && AnimInstance->Implements<UAnimationInterface>()) {
-		FVector start = GetActorLocation() - (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * FVector(
-			0.f, 0.f, 1.f));
-		FVector end = GetActorLocation() * FVector(0.f, 0.f, 1000.f);
-		FHitResult hit;
-		bool OnHit = GetWorld()->LineTraceSingleByChannel(hit, start, end, ECollisionChannel::ECC_Visibility);
-		if(OnHit) {
-			IAnimationInterface::Execute_GroundDistance(AnimInstance, hit.Distance);
-		}
-	}
-}
-
-
-
-void AMegaCharacter::SetCharacterStates() {
-	FCharacterSettings JoggingSettings;
-	JoggingSettings.MaxWalkSpeed = 800.f;
-	JoggingSettings.MaxAcceleration = 800.f;
-	JoggingSettings.BrakingDeceleration = 1200.f;
-	JoggingSettings.BrakingFrictionFactor = 1.0f;
-	JoggingSettings.BrakingFriction = 0.0f;
-	JoggingSettings.bUseSeparateBrakingFriction = true;
-
-	FCharacterSettings WalkingSettings;
-	WalkingSettings.MaxWalkSpeed = 250.f;
-	WalkingSettings.MaxAcceleration = 250.f;
-	WalkingSettings.BrakingDeceleration = 1000.f;
-	WalkingSettings.BrakingFrictionFactor = 1.0f;
-	WalkingSettings.BrakingFriction = 0.0f;
-	WalkingSettings.bUseSeparateBrakingFriction = true;
-
-	FCharacterSettings CrouchingSettings;
-	CrouchingSettings.MaxWalkSpeed = 250.f;
-	CrouchingSettings.MaxAcceleration = 250.f;
-	CrouchingSettings.BrakingDeceleration = 1000.f;
-	CrouchingSettings.BrakingFrictionFactor = 1.0f;
-	CrouchingSettings.BrakingFriction = 0.0f;
-	CrouchingSettings.bUseSeparateBrakingFriction = true;
-
-	StateSettingsMap.Add(ECharacterState::Jogging, JoggingSettings);
-	StateSettingsMap.Add(ECharacterState::Walking, WalkingSettings);
-	StateSettingsMap.Add(ECharacterState::Crouching, CrouchingSettings);
-}
-
-void AMegaCharacter::UpdateCharacterStateWithSettings(ECharacterState NewState) {
-	FCharacterSettings NewSettings = StateSettingsMap[NewState];
-
-	GetCharacterMovement()->MaxWalkSpeed = NewSettings.MaxWalkSpeed;
-	GetCharacterMovement()->MaxAcceleration = NewSettings.MaxAcceleration;
-	GetCharacterMovement()->BrakingDecelerationWalking = NewSettings.BrakingDeceleration;
-	GetCharacterMovement()->BrakingFrictionFactor = NewSettings.BrakingFrictionFactor;
-	GetCharacterMovement()->BrakingFriction = NewSettings.BrakingFriction;
-	GetCharacterMovement()->bUseSeparateBrakingFriction = NewSettings.bUseSeparateBrakingFriction;
-
-	if(NewState == ECharacterState::Jogging) {
-		SetJogState();
-	} else if(NewState == ECharacterState::Walking) {
-		SetWalkState();
-	} else if(NewState == ECharacterState::Crouching) {
-		SetCrouchState();
-	}
-}
-
 
 void AMegaCharacter::Move(const FInputActionValue& Value) {
 	FVector2D MovementVector = Value.Get<FVector2D>();
