@@ -10,6 +10,7 @@
 class UCombatComponent;
 class UInputAction;
 class UInputMappingContext;
+class AWeapon;
 
 UCLASS()
 class MEGA_API AMegaCharacter : public ACharacter {
@@ -34,12 +35,21 @@ public:
 	UInputAction* JumpAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* WalkAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* CrouchAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	void AddMappingContext();
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void StartWalking();
+	void StopWalking();
+	void Crouch();
 	void StartJumping();
 	virtual void StopJumping() override;
 	

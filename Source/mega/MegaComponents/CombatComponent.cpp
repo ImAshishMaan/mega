@@ -94,6 +94,7 @@ void UCombatComponent::SetCharacterStates() {
 }
 
 void UCombatComponent::UpdateCharacterStateWithSettings(ECharacterState NewState) {
+	CurrentState = NewState;
 	FCharacterSettings NewSettings = StateSettingsMap[NewState];
 
 	MegaMovementComponent->MaxWalkSpeed = NewSettings.MaxWalkSpeed;

@@ -48,6 +48,9 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AMegaCharacter::StartJumping);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AMegaCharacter::StopJumping);
+		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Triggered, this, &AMegaCharacter::StartWalking);
+		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Completed, this, &AMegaCharacter::StopWalking);
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Crouch);
 	}
 }
 
@@ -80,6 +83,24 @@ void AMegaCharacter::Look(const FInputActionValue& Value) {
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
+}
+
+void AMegaCharacter::StartWalking() {
+	if(CombatComponent) {
+		CombatComponent->UpdateCharacterStateWithSettings(ECharacterState::Walking);
+	}
+}
+void AMegaCharacter::StopWalking() {
+	if(CombatComponent) {
+		CombatComponent->UpdateCharacterStateWithSettings(ECharacterState::Jogging);
+	}
+}
+void AMegaCharacter::Crouch() {
+	if(CombatComponent && CombatComponent->CurrentState != ECharacterState::Crouching) {
+		CombatComponent->UpdateCharacterStateWithSettings(ECharacterState::Crouching);
+	}else {
+		CombatComponent->UpdateCharacterStateWithSettings(ECharacterState::Jogging);
+	}
 }
 
 void AMegaCharacter::StartJumping() {
