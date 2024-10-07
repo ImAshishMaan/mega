@@ -64,3 +64,16 @@ struct FCharacterSettings {
 		  BrakingFriction(0.0f),
 		  bUseSeparateBrakingFriction(true) {}
 };
+
+USTRUCT(BlueprintType)
+struct FHUDPackage {
+	GENERATED_BODY()
+
+public:
+	UTexture2D* CrosshairsCenter = nullptr;
+	UTexture2D* CrosshairsLeft = nullptr;
+	UTexture2D* CrosshairsRight	= nullptr;
+	UTexture2D* CrosshairsTop = nullptr;
+	UTexture2D* CrosshairsBottom = nullptr;
+	
+};
