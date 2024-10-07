@@ -33,6 +33,7 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		TraceUnderCrosshairs(HitResult);
 		HitTarget = HitResult.ImpactPoint;
 	}
+	SetGroundDistance();
 }
 
 void UCombatComponent::SetWalkState() {

@@ -24,5 +24,4 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Animation")
 	void GroundDistance(float CurrentGroundDistance);
 
-public:
 };
