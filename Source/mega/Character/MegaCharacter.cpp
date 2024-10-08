@@ -115,6 +115,7 @@ void AMegaCharacter::StopJumping() {
 }
 
 void AMegaCharacter::Equip() {
+	// TODO: to unequip specific weapon better use struct for sockets names 
 	if(OverlappingWeapon) {
 		if(CombatComponent) {
 			CombatComponent->SetAnimLayer(EEquipped::Rifle);

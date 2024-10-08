@@ -139,7 +139,7 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip) {
 
 	EquippedWeapon = WeaponToEquip;
 	// Attach to actor;
-	const USkeletalMeshSocket* Socket = MegaCharacter->GetMesh()->GetSocketByName("RightHandSocket");
+	const USkeletalMeshSocket* Socket = MegaCharacter->GetMesh()->GetSocketByName("WeaponEquipped");
 	if(Socket) {
 		Socket->AttachActor(EquippedWeapon, MegaCharacter->GetMesh());
 	}
