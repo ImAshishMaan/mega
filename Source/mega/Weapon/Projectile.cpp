@@ -1,6 +1,7 @@
 #include "Projectile.h"
 
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "mega/mega.h"
 
 AProjectile::AProjectile() {
@@ -25,6 +26,11 @@ void AProjectile::BeginPlay() {
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                         FVector NormalImpulse, const FHitResult& Hit) {
+
+	if(ImpactParticle) {
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticle, GetActorLocation(), FRotator(0.f), true);
+	}
+	
 	Destroy();
 }
 
