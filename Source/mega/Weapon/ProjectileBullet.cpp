@@ -7,6 +7,8 @@
 AProjectileBullet::AProjectileBullet() {
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->bRotationFollowsVelocity = true;
+	ProjectileMovement->InitialSpeed = 30000.0f;
+	ProjectileMovement->MaxSpeed = 30000.0f;
 }
 
 void AProjectileBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,

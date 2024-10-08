@@ -14,6 +14,7 @@ class MEGA_API AProjectile : public AActor {
 public:
 	AProjectile();
 	virtual void Tick(float DeltaTime) override;
+	void ShowImpactParticles();
 
 protected:
 	virtual void BeginPlay() override;
@@ -41,6 +42,10 @@ protected:
 	USoundCue* ImpactSound;
 
 private:
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* Tracer;
 
+	UPROPERTY()
+	UParticleSystemComponent* TracerComponent;
 	
 };

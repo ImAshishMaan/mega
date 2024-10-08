@@ -15,7 +15,7 @@ void ARifleProjectileWeapon::Fire(const FVector& HitTarget) {
 
 		const FVector ToTarget = HitTarget - SocketTransform.GetLocation();
 		FRotator TargetRotaion = ToTarget.Rotation();
-
+		checkf(ProjectileClass, TEXT("Projectile class not set."));
 		if(ProjectileClass && InstigatorPawn) {
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Instigator = InstigatorPawn;
