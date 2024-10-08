@@ -91,6 +91,8 @@ void UMegaAnimInstance::SetLocationData(float DeltaTime) {
 	const float Target = DeltaActorYaw / DeltaTime;
 	const float Interp = FMath::FInterpTo(LeanAngle, Target, DeltaTime, 6.f);
 	LeanAngle = FMath::Clamp(Interp, -90.f, 90.f);
+
+	AimPitchOffset = UKismetMathLibrary::NormalizeAxis(TryGetPawnOwner()->GetBaseAimRotation().Pitch);
 	
 }
 

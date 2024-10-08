@@ -138,6 +138,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RootYawOffset")
 	float RootYawOffset;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RootYawOffset")
+	float AimPitchOffset;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RootYawOffset")
 	ERootYawOffsetMode RootYawOffsetMode = ERootYawOffsetMode::Accumulate;
