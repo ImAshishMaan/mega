@@ -7,6 +7,7 @@
 #include "CoreMinimal.h"
 #include "MegaCharacter.generated.h"
 
+class UMontagesComponent;
 class UCombatComponent;
 class UInputAction;
 class UInputMappingContext;
@@ -47,6 +48,9 @@ public:
 	UInputAction* FireAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ReloadAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	void AddMappingContext();
@@ -61,6 +65,7 @@ public:
 	void Equip();
 	void FireButtonPressed();
 	void FireButtonReleased();
+	void ReloadButtonPressed();
 	
 
 protected:
@@ -70,6 +75,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* CombatComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UMontagesComponent* MontagesComponent;
 
 private:
 	UPROPERTY()

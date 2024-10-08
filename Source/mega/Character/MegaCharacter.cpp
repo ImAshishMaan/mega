@@ -5,12 +5,14 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "mega/MegaComponents/CombatComponent.h"
+#include "mega/MegaComponents/MontagesComponent.h"
 #include "mega/PlayerController/MegaPlayerController.h"
 
 AMegaCharacter::AMegaCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	MontagesComponent = CreateDefaultSubobject<UMontagesComponent>(TEXT("MontagesComponent"));
 	
 }
 
@@ -54,6 +56,7 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Equip);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AMegaCharacter::FireButtonPressed);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AMegaCharacter::FireButtonReleased);
+		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ReloadButtonPressed);
 	}
 }
 
@@ -63,6 +66,10 @@ void AMegaCharacter::PostInitializeComponents() {
 	if(CombatComponent) {
 		CombatComponent->MegaCharacter = this;
 		CombatComponent->MegaPlayerController = Cast<AMegaPlayerController>(GetController());
+		CombatComponent->MontagesComponent = MontagesComponent;
+	}
+	if(MontagesComponent) {
+		MontagesComponent->MegaCharacter = this;
 	}
 }
 
@@ -132,5 +139,11 @@ void AMegaCharacter::FireButtonPressed() {
 void AMegaCharacter::FireButtonReleased() {
 	if(CombatComponent) {
 		CombatComponent->FireButtonPressed(false);
+	}
+}
+
+void AMegaCharacter::ReloadButtonPressed() {
+	if(MontagesComponent) {
+		MontagesComponent->PlayReloadMontage();
 	}
 }

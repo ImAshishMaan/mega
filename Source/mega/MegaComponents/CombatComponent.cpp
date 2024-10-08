@@ -1,5 +1,6 @@
 #include "CombatComponent.h"
 
+#include "MontagesComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -170,6 +171,7 @@ void UCombatComponent::Fire() {
 		bCanFire = false;
 		EquippedWeapon->Fire(HitTarget);
 		StartFireTimer();
+		MontagesComponent->PlayFireMontage();
 	}
 }
 

@@ -10,6 +10,7 @@ class AWeapon;
 class UCharacterMovementComponent;
 class AMegaHUD;
 class AMegaPlayerController;
+class UMontagesComponent;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class MEGA_API UCombatComponent : public UActorComponent , public IAnimationInterface {
@@ -70,6 +71,9 @@ private:
 	// Setting MegaCharacter, MegaPlayerController and MegaHUD in MegaCharacter.cpp
 	UPROPERTY()
 	AMegaCharacter* MegaCharacter;
+
+	UPROPERTY()
+	UMontagesComponent* MontagesComponent;
 
 	UPROPERTY()
 	UCharacterMovementComponent* MegaMovementComponent;
