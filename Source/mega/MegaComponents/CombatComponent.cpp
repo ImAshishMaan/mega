@@ -214,11 +214,17 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult) {
 			//DrawDebugSphere(GetWorld(), Start, 16.0f, 12, FColor::Red, false);
 		}
 		FVector End = Start + CrosshairWorldDirection * 80000.0f;
+
+		// Ignore character
+		FCollisionQueryParams TracerParams;
+		TracerParams.AddIgnoredActor(MegaCharacter);
+		
 		GetWorld()->LineTraceSingleByChannel(
 			TraceHitResult,
 			Start,
 			End,
-			ECollisionChannel::ECC_Visibility
+			ECollisionChannel::ECC_Visibility,
+			TracerParams
 		);
 	}
 }
