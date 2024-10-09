@@ -73,5 +73,6 @@ private:
 
 public:
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
+	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
 	
 };

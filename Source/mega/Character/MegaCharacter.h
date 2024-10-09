@@ -54,6 +54,12 @@ public:
 	UInputAction* ReloadAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* PrimaryWeaponAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* SecondaryWeaponAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	void AddMappingContext();
@@ -71,6 +77,8 @@ public:
 	void FireButtonPressed();
 	void FireButtonReleased();
 	void ReloadButtonPressed();
+	void PrimaryWeaponButtonPressed();
+	void SecondaryWeaponButtonPressed();
 	
 
 protected:

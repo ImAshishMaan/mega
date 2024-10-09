@@ -150,12 +150,15 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip) {
 
 	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 	// Attach to actor;
-	const USkeletalMeshSocket* Socket = MegaCharacter->GetMesh()->GetSocketByName("WeaponEquipped");
-	if(Socket) {
-		Socket->AttachActor(EquippedWeapon, MegaCharacter->GetMesh());
-	}
+	AttachActorToComponent("WeaponEquipped");
 
 	EquippedWeapon->SetOwner(MegaCharacter);
+
+	if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Rifle) {
+		PrimaryWeapon = EquippedWeapon;
+	} else if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Pistol) {
+		SecondaryWeapon = EquippedWeapon;
+	}
 	// call Set hud weapon ammo in weapon class
 	// call set Hud carried ammo in player controller class
 
@@ -165,7 +168,33 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip) {
 
 void UCombatComponent::DropWeapon() {
 	if(EquippedWeapon) {
+		if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Rifle) {
+			PrimaryWeapon = nullptr;
+		}else if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Pistol) {
+			SecondaryWeapon = nullptr;
+		}
 		EquippedWeapon->Dropped();
+		EquippedWeapon = nullptr;
+	}
+}
+
+void UCombatComponent::AttachActorToComponent(FName SocketName) {
+	const USkeletalMeshSocket* Socket = MegaCharacter->GetMesh()->GetSocketByName(SocketName);
+	if(Socket) {
+		Socket->AttachActor(EquippedWeapon, MegaCharacter->GetMesh());
+	}
+}
+
+void UCombatComponent::HolsterWeapon() {
+	if(EquippedWeapon) {
+		if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Rifle) {
+			PrimaryWeapon = EquippedWeapon;
+			AttachActorToComponent("HolsterRifle");
+		}else if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Pistol) {
+			SecondaryWeapon = EquippedWeapon;
+			AttachActorToComponent("HolsterPistol");
+		}
+		UpdateCharacterStateWithSettings(ECharacterState::Jogging);
 		EquippedWeapon = nullptr;
 	}
 }

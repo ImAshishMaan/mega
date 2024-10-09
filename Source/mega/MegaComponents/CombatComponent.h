@@ -4,6 +4,7 @@
 #include "Components/ActorComponent.h"
 #include "mega/CombatState.h"
 #include "mega/Interfaces/AnimationInterface.h"
+#include "mega/Weapon/WeaponEnums.h"
 #include "CombatComponent.generated.h"
 
 
@@ -61,6 +62,8 @@ public:
 	 */
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	void DropWeapon();
+	void AttachActorToComponent(FName SocketName);
+	void HolsterWeapon();
 	void FireButtonPressed(bool bPressed);
 	void Fire();
 
@@ -99,6 +102,12 @@ private:
 
 	UPROPERTY()
 	AWeapon* EquippedWeapon;
+
+	UPROPERTY()
+	AWeapon* PrimaryWeapon;
+
+	UPROPERTY()
+	AWeapon* SecondaryWeapon;
 
 	bool bFireButtonPressed;
 	bool bAimButtonPressed;
