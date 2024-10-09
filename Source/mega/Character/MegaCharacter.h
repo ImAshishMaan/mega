@@ -5,6 +5,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
 #include "CoreMinimal.h"
+#include "mega/MegaComponents/CombatComponent.h"
 #include "MegaCharacter.generated.h"
 
 class UCameraComponent;
@@ -113,7 +114,8 @@ private:
 
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
+	bool IsWeaponEquipped();
 
-
+	FORCEINLINE AWeapon* GetEquippedWeapon() { return CombatComponent->EquippedWeapon; }
 	
 };

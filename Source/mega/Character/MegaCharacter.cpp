@@ -48,6 +48,7 @@ void AMegaCharacter::SetOverlappingWeapon(AWeapon* Weapon) {
 	}
 }
 
+
 void AMegaCharacter::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 }
@@ -232,4 +233,8 @@ void AMegaCharacter::ChangePOVButtonPressed() {
 		FollowCameraTP->SetActive(true);
 		FollowCameraFP->SetActive(false);
 	}
+}
+
+bool AMegaCharacter::IsWeaponEquipped() {
+	return (CombatComponent && CombatComponent->EquippedWeapon);
 }
