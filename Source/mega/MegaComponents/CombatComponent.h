@@ -100,6 +100,7 @@ private:
 	AWeapon* EquippedWeapon;
 
 	bool bFireButtonPressed;
+	bool bAimButtonPressed;
 
 	/*
 	 * Automatic Fire
@@ -112,6 +113,9 @@ private:
 
 	// Target that are under crosshair live
 	FVector HitTarget;
+
+public:
+	FORCEINLINE void SetAimButtonPressed(bool bPressed) { bAimButtonPressed = bPressed; }
 
 	
 };

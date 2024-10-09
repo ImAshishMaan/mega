@@ -171,7 +171,7 @@ void UCombatComponent::FireButtonPressed(bool bPressed) {
 
 bool UCombatComponent::CanFire() {
 	if(EquippedWeapon == nullptr) return false;
-	return bCanFire && CombatState != ECombatState::ECS_Reloading;
+	return bCanFire && CombatState != ECombatState::ECS_Reloading && bAimButtonPressed;
 }
 
 void UCombatComponent::Fire() {

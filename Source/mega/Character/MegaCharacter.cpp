@@ -54,6 +54,8 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Completed, this, &AMegaCharacter::StopWalking);
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Crouch);
 		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Equip);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AMegaCharacter::AimButtonPressed);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AMegaCharacter::AimButtonReleased);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AMegaCharacter::FireButtonPressed);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AMegaCharacter::FireButtonReleased);
 		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ReloadButtonPressed);
@@ -129,6 +131,19 @@ void AMegaCharacter::Equip() {
 			CombatComponent->SetAnimLayer(EEquipped::Rifle);
 			CombatComponent->EquipWeapon(OverlappingWeapon);
 		}
+	}
+}
+
+void AMegaCharacter::AimButtonPressed() {
+	if(CombatComponent) {
+		CombatComponent->UpdateCharacterStateWithSettings(ECharacterState::Walking);
+		CombatComponent->SetAimButtonPressed(true);
+	}
+}
+void AMegaCharacter::AimButtonReleased() {
+	if(CombatComponent) {
+		CombatComponent->UpdateCharacterStateWithSettings(ECharacterState::Jogging);
+		CombatComponent->SetAimButtonPressed(false);
 	}
 }
 

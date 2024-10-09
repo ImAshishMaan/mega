@@ -45,6 +45,9 @@ public:
 	UInputAction* EquipAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* AimAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* FireAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
@@ -63,6 +66,8 @@ public:
 	void StartJumping();
 	virtual void StopJumping() override;
 	void Equip();
+	void AimButtonPressed();
+	void AimButtonReleased();
 	void FireButtonPressed();
 	void FireButtonReleased();
 	void ReloadButtonPressed();
