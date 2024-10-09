@@ -7,6 +7,7 @@
 #include "mega/MegaComponents/CombatComponent.h"
 #include "mega/MegaComponents/MontagesComponent.h"
 #include "mega/PlayerController/MegaPlayerController.h"
+#include "mega/Weapon/Weapon.h"
 
 AMegaCharacter::AMegaCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -127,9 +128,12 @@ void AMegaCharacter::StopJumping() {
 void AMegaCharacter::Equip() {
 	// TODO: to unequip specific weapon better use struct for sockets names 
 	if(OverlappingWeapon) {
-		if(CombatComponent) {
+		if(CombatComponent && CombatComponent->EquippedWeapon == nullptr) {
 			CombatComponent->SetAnimLayer(EEquipped::Rifle);
 			CombatComponent->EquipWeapon(OverlappingWeapon);
+		}else if(CombatComponent && CombatComponent->EquippedWeapon) {
+			CombatComponent->SetAnimLayer(EEquipped::UnEquipped);
+			CombatComponent->DropWeapon();
 		}
 	}
 }

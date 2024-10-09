@@ -57,9 +57,10 @@ public:
 	void SetAnimLayer(EEquipped CurrentEquipped);
 
 	/*
-	 * Equip Weapon
+	 * Equip, Fire and drop Weapon
 	 */
 	void EquipWeapon(AWeapon* WeaponToEquip);
+	void DropWeapon();
 	void FireButtonPressed(bool bPressed);
 	void Fire();
 

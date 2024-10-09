@@ -16,6 +16,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Fire(const FVector& HitTarget);
+	void Dropped();
+	void SetWeaponState(EWeaponState State);
+	void OnWeaponStateSet();
 
 	/*
 	 * Automatic Fire

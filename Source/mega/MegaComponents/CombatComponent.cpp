@@ -147,6 +147,8 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip) {
 	if(WeaponToEquip == nullptr) return;
 
 	EquippedWeapon = WeaponToEquip;
+
+	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 	// Attach to actor;
 	const USkeletalMeshSocket* Socket = MegaCharacter->GetMesh()->GetSocketByName("WeaponEquipped");
 	if(Socket) {
@@ -159,6 +161,13 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip) {
 
 
 	// Play equip sound from weapon class
+}
+
+void UCombatComponent::DropWeapon() {
+	if(EquippedWeapon) {
+		EquippedWeapon->Dropped();
+		EquippedWeapon = nullptr;
+	}
 }
 
 void UCombatComponent::FireButtonPressed(bool bPressed) {
