@@ -14,7 +14,7 @@ class MEGA_API AProjectile : public AActor {
 public:
 	AProjectile();
 	virtual void Tick(float DeltaTime) override;
-	void ShowImpactParticles();
+	void ShowImpactParticles(UPrimitiveComponent* HitComponent,  AActor* OtherActor);
 
 protected:
 	virtual void BeginPlay() override;
@@ -31,12 +31,17 @@ protected:
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	                   FVector NormalImpulse, const FHitResult& Hit);
+	void PlayImpactSound();
 
 	UPROPERTY(EditAnywhere)
 	float Damage = 20.0f;
 
+	// Impact particles for different materials
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* ImpactParticle;
+	UParticleSystem* MetalImpactParticle;
+	
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* WoodImpactParticle;
 
 	UPROPERTY(EditAnywhere)
 	USoundCue* ImpactSound;

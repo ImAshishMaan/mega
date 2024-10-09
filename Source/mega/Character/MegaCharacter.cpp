@@ -70,6 +70,7 @@ void AMegaCharacter::PostInitializeComponents() {
 	}
 	if(MontagesComponent) {
 		MontagesComponent->MegaCharacter = this;
+		MontagesComponent->CombatComponent = CombatComponent;
 	}
 }
 

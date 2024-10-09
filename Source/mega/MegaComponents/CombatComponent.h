@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "mega/CombatState.h"
 #include "mega/Interfaces/AnimationInterface.h"
 #include "CombatComponent.generated.h"
 
@@ -62,10 +63,21 @@ public:
 	void FireButtonPressed(bool bPressed);
 	void Fire();
 
+	/*
+	 * Trace Under Crosshairs
+	 */
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
+
+	/*
+	 * Combat State
+	 */
+	ECombatState CombatState = ECombatState::ECS_Unoccupied;
+
+	
 
 protected:
 	virtual void BeginPlay() override;
+	void StartTrace();
 
 private:
 	// Setting MegaCharacter, MegaPlayerController and MegaHUD in MegaCharacter.cpp

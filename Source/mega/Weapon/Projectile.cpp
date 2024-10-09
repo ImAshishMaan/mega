@@ -7,7 +7,6 @@
 AProjectile::AProjectile() {
 	PrimaryActorTick.bCanEverTick = true;
 
-	
 
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	SetRootComponent(CollisionBox);
@@ -43,15 +42,35 @@ void AProjectile::Tick(float DeltaTime) {
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                         FVector NormalImpulse, const FHitResult& Hit) {
-	ShowImpactParticles();
+	ShowImpactParticles(HitComp, OtherActor);
+	PlayImpactSound();
 	Destroy();
 }
 
-void AProjectile::ShowImpactParticles() {
-	if(ImpactParticle) {
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticle, GetActorLocation(), FRotator(0.f), true);
-	}
+void AProjectile::PlayImpactSound() {
 	if(ImpactSound) {
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+	}
+}
+
+void AProjectile::ShowImpactParticles(UPrimitiveComponent* HitComponent, AActor* OtherActor) {
+	UStaticMeshComponent* MeshComp = Cast<UStaticMeshComponent>(OtherActor->GetComponentByClass(UStaticMeshComponent::StaticClass()));
+	if(MeshComp) {
+		UMaterialInterface* Material = MeshComp->GetMaterial(0);
+		if (Material) {
+			UPhysicalMaterial* PhysicalMaterialFromVisual = Material->GetPhysicalMaterial();
+			if (PhysicalMaterialFromVisual) {
+				EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(PhysicalMaterialFromVisual); 
+				if (SurfaceType == SurfaceType_Metal && MetalImpactParticle) {
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MetalImpactParticle, GetActorLocation(), FRotator(0.f), true);
+				} else if (SurfaceType == SurfaceType_Wood && WoodImpactParticle) {
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), WoodImpactParticle, GetActorLocation(), FRotator(0.f), true);
+				}
+			}
+		} else {
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MetalImpactParticle, GetActorLocation(), FRotator(0.f), true); // Default particle
+		}
+	} else {
+		UE_LOG(LogTemp, Warning, TEXT("Projectile: No StaticMeshComponent found on hit actor!"));
 	}
 }

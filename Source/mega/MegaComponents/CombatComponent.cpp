@@ -25,16 +25,24 @@ void UCombatComponent::BeginPlay() {
 }
 
 
-void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                     FActorComponentTickFunction* ThisTickFunction) {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+void UCombatComponent::StartTrace() {
 	if(MegaCharacter) {
 		FHitResult HitResult;
 		TraceUnderCrosshairs(HitResult);
 		HitTarget = HitResult.ImpactPoint;
 	}
-	SetGroundDistance();
+}
+
+void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                     FActorComponentTickFunction* ThisTickFunction) {
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// Not a good idea to tick every frame 
+	StartTrace();
+	
+	if(MegaMovementComponent->MovementMode > EMovementMode::MOVE_Walking) {
+		SetGroundDistance();
+	}
 }
 
 void UCombatComponent::SetWalkState() {
@@ -163,7 +171,7 @@ void UCombatComponent::FireButtonPressed(bool bPressed) {
 
 bool UCombatComponent::CanFire() {
 	if(EquippedWeapon == nullptr) return false;
-	return bCanFire;
+	return bCanFire && CombatState != ECombatState::ECS_Reloading;
 }
 
 void UCombatComponent::Fire() {

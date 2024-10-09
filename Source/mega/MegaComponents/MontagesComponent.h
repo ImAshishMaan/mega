@@ -5,6 +5,8 @@
 #include "MontagesComponent.generated.h"
 
 
+class UCombatComponent;
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class MEGA_API UMontagesComponent : public UActorComponent {
 	GENERATED_BODY()
@@ -12,10 +14,10 @@ class MEGA_API UMontagesComponent : public UActorComponent {
 public:
 	UMontagesComponent();
 	friend class AMegaCharacter;
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	void PlayFireMontage();
+	UFUNCTION()
+	void OnFireMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 	void PlayReloadMontage();
 
 protected:
@@ -24,6 +26,9 @@ protected:
 private:
 	UPROPERTY()
 	AMegaCharacter* MegaCharacter;
+
+	UPROPERTY()
+	UCombatComponent* CombatComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Weapons")
 	UAnimMontage* FireMontage;
