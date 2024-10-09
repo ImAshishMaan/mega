@@ -1,9 +1,11 @@
 #include "MegaCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "Animation/AnimInstance.h"
+#include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/LocalPlayer.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "mega/MegaComponents/CombatComponent.h"
 #include "mega/MegaComponents/MontagesComponent.h"
 #include "mega/PlayerController/MegaPlayerController.h"
@@ -11,6 +13,22 @@
 
 AMegaCharacter::AMegaCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
+
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	SpringArmComponent->SetupAttachment(GetRootComponent());
+	SpringArmComponent->TargetArmLength = 350.0f;
+	SpringArmComponent->bUsePawnControlRotation = true;
+	SpringArmComponent->bEnableCameraRotationLag = true;
+
+	FollowCameraTP = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCameraTP"));
+	FollowCameraTP->SetupAttachment(SpringArmComponent);
+	FollowCameraTP->bUsePawnControlRotation = false;
+	FollowCameraTP->SetRelativeLocation(FVector(0.0f, 50.0f, 50.0f));
+
+	FollowCameraFP = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCameraFP"));
+	FollowCameraFP->SetupAttachment(GetMesh(), "head");
+	FollowCameraFP->bUsePawnControlRotation = true;
+	FollowCameraFP->SetAutoActivate(false);
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	MontagesComponent = CreateDefaultSubobject<UMontagesComponent>(TEXT("MontagesComponent"));
@@ -62,6 +80,7 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ReloadButtonPressed);
 		EnhancedInputComponent->BindAction(PrimaryWeaponAction, ETriggerEvent::Triggered, this, &AMegaCharacter::PrimaryWeaponButtonPressed);
 		EnhancedInputComponent->BindAction(SecondaryWeaponAction, ETriggerEvent::Triggered, this, &AMegaCharacter::SecondaryWeaponButtonPressed);
+		EnhancedInputComponent->BindAction(ChangePOVAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ChangePOVButtonPressed);
 	}
 }
 
@@ -202,5 +221,15 @@ void AMegaCharacter::SecondaryWeaponButtonPressed() {
 			CombatComponent->SetAnimLayer(EEquipped::Pistol);
 			CombatComponent->EquipWeapon(CombatComponent->SecondaryWeapon);
 		}
+	}
+}
+
+void AMegaCharacter::ChangePOVButtonPressed() {
+	if(FollowCameraTP->IsActive()) {
+		FollowCameraFP->SetActive(true);
+		FollowCameraTP->SetActive(false);
+	} else if(FollowCameraFP->IsActive()) {
+		FollowCameraTP->SetActive(true);
+		FollowCameraFP->SetActive(false);
 	}
 }

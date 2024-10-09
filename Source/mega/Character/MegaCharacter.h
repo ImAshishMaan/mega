@@ -7,6 +7,8 @@
 #include "CoreMinimal.h"
 #include "MegaCharacter.generated.h"
 
+class UCameraComponent;
+class USpringArmComponent;
 class UMontagesComponent;
 class UCombatComponent;
 class UInputAction;
@@ -54,6 +56,9 @@ public:
 	UInputAction* ReloadAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ChangePOVAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* PrimaryWeaponAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
@@ -79,6 +84,7 @@ public:
 	void ReloadButtonPressed();
 	void PrimaryWeaponButtonPressed();
 	void SecondaryWeaponButtonPressed();
+	void ChangePOVButtonPressed();
 	
 
 protected:
@@ -88,6 +94,15 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* CombatComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* SpringArmComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FollowCameraTP;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FollowCameraFP;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UMontagesComponent* MontagesComponent;
