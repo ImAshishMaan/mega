@@ -1,4 +1,6 @@
 #include "MegaAnimInstance.h"
+
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "mega/Weapon/Weapon.h"
