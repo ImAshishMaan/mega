@@ -4,6 +4,8 @@
 #include "GameFramework/Character.h"
 #include "SAICharacter.generated.h"
 
+class UPawnSensingComponent;
+
 UCLASS()
 class MEGA_API ASAICharacter : public ACharacter {
 	GENERATED_BODY()
@@ -12,8 +14,15 @@ public:
 	ASAICharacter();
 
 protected:
-	virtual void BeginPlay() override;
+	void PostInitializeComponents() override;
+	
+	UPROPERTY(VisibleAnywhere, Category = "AI")
+	UPawnSensingComponent* PawnSensingComp;
 
-public:
-	virtual void Tick(float DeltaTime) override;
+	UFUNCTION()
+	void OnPawnSeen(APawn* SeenPawn);
+	
+private:
+
+	
 };
