@@ -6,6 +6,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "mega/MegaComponents/AbilityComponent.h"
 #include "mega/MegaComponents/AttributeComponent.h"
 #include "mega/MegaComponents/CombatComponent.h"
 #include "mega/MegaComponents/MontagesComponent.h"
@@ -34,6 +35,7 @@ AMegaCharacter::AMegaCharacter() {
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	MontagesComponent = CreateDefaultSubobject<UMontagesComponent>(TEXT("MontagesComponent"));
 	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
+	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("AbilityComponent"));
 }
 
 
@@ -74,22 +76,15 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Completed, this, &AMegaCharacter::StopWalking);
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Crouch);
 		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Equip);
-		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this,
-		                                   &AMegaCharacter::AimButtonPressed);
-		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this,
-		                                   &AMegaCharacter::AimButtonReleased);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this,
-		                                   &AMegaCharacter::FireButtonPressed);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this,
-		                                   &AMegaCharacter::FireButtonReleased);
-		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this,
-		                                   &AMegaCharacter::ReloadButtonPressed);
-		EnhancedInputComponent->BindAction(PrimaryWeaponAction, ETriggerEvent::Triggered, this,
-		                                   &AMegaCharacter::PrimaryWeaponButtonPressed);
-		EnhancedInputComponent->BindAction(SecondaryWeaponAction, ETriggerEvent::Triggered, this,
-		                                   &AMegaCharacter::SecondaryWeaponButtonPressed);
-		EnhancedInputComponent->BindAction(ChangePOVAction, ETriggerEvent::Triggered, this,
-		                                   &AMegaCharacter::ChangePOVButtonPressed);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AMegaCharacter::AimButtonPressed);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AMegaCharacter::AimButtonReleased);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AMegaCharacter::FireButtonPressed);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AMegaCharacter::FireButtonReleased);
+		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ReloadButtonPressed);
+		EnhancedInputComponent->BindAction(PrimaryWeaponAction, ETriggerEvent::Triggered, this, &AMegaCharacter::PrimaryWeaponButtonPressed);
+		EnhancedInputComponent->BindAction(SecondaryWeaponAction, ETriggerEvent::Triggered, this, &AMegaCharacter::SecondaryWeaponButtonPressed);
+		EnhancedInputComponent->BindAction(ChangePOVAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ChangePOVButtonPressed);
+		EnhancedInputComponent->BindAction(QAbilityAction, ETriggerEvent::Triggered, this, &AMegaCharacter::QAbilityButtonPressed);
 	}
 }
 
@@ -99,6 +94,7 @@ void AMegaCharacter::PostInitializeComponents() {
 	if(CombatComponent) {
 		CombatComponent->MegaCharacter = this;
 		CombatComponent->MontagesComponent = MontagesComponent;
+		CombatComponent->AbilityComponent = AbilityComponent;
 		CombatComponent->InitializeCombatSystem();
 	}
 	if(MontagesComponent) {
@@ -110,6 +106,10 @@ void AMegaCharacter::PostInitializeComponents() {
 	if(AttributeComponent) {
 		AttributeComponent->MegaCharacter = this;
 		AttributeComponent->InitializeAttributesSystem();
+	}
+	if(AbilityComponent) {
+		AbilityComponent->MegaCharacter = this;
+		AbilityComponent->InitializeAbilitySystem();
 	}
 }
 
@@ -226,7 +226,7 @@ void AMegaCharacter::ReloadButtonPressed() {
 void AMegaCharacter::PrimaryWeaponButtonPressed() {
 	if(CombatComponent) {
 		if(CombatComponent->PrimaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->
-			GetWeaponType() == CombatComponent->PrimaryWeapon->GetWeaponType()) {
+		                                                                                         GetWeaponType() == CombatComponent->PrimaryWeapon->GetWeaponType()) {
 			CombatComponent->SetAnimLayer(EEquipped::UnEquipped);
 			CombatComponent->HolsterWeapon();
 		} else if(CombatComponent->PrimaryWeapon) {
@@ -239,7 +239,7 @@ void AMegaCharacter::PrimaryWeaponButtonPressed() {
 void AMegaCharacter::SecondaryWeaponButtonPressed() {
 	if(CombatComponent) {
 		if(CombatComponent->SecondaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->
-			GetWeaponType() == CombatComponent->SecondaryWeapon->GetWeaponType()) {
+		                                                                                           GetWeaponType() == CombatComponent->SecondaryWeapon->GetWeaponType()) {
 			CombatComponent->SetAnimLayer(EEquipped::UnEquipped);
 			CombatComponent->HolsterWeapon();
 		} else if(CombatComponent->SecondaryWeapon) {
@@ -256,6 +256,12 @@ void AMegaCharacter::ChangePOVButtonPressed() {
 	} else if(FollowCameraFP->IsActive()) {
 		FollowCameraTP->SetActive(true);
 		FollowCameraFP->SetActive(false);
+	}
+}
+
+void AMegaCharacter::QAbilityButtonPressed() {
+	if(CombatComponent) {
+		CombatComponent->MagicAbility();
 	}
 }
 

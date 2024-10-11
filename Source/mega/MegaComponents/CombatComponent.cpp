@@ -1,5 +1,6 @@
 #include "CombatComponent.h"
 
+#include "AbilityComponent.h"
 #include "MontagesComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
@@ -187,6 +188,25 @@ void UCombatComponent::FireButtonPressed(bool bPressed) {
 bool UCombatComponent::CanFire() {
 	if(EquippedWeapon == nullptr) return false;
 	return bCanFire && CombatState != ECombatState::ECS_Reloading && bAimButtonPressed;
+}
+
+void UCombatComponent::StartMagicTimer() {
+	GetWorld()->GetTimerManager().SetTimer(MagicTimer, this, &UCombatComponent::MagicTimerFinished, AbilityComponent->GetMagicFireDelay());
+}
+void UCombatComponent::MagicTimerFinished() {
+	bCanUseMagic = true;
+}
+
+bool UCombatComponent::CanUseMagic() {
+	return bHaveMagicAbility && bCanUseMagic && EquippedWeapon == nullptr;
+}
+
+void UCombatComponent::MagicAbility() {
+	if(CanUseMagic()) {
+		bCanUseMagic = false;
+		AbilityComponent->MagicAttack(HitTarget);
+		StartMagicTimer();
+	}
 }
 
 void UCombatComponent::Fire() {

@@ -32,7 +32,7 @@ void AProjectile::BeginPlay() {
 			EAttachLocation::KeepWorldPosition
 		);
 	}
-
+	CollisionBox->IgnoreActorWhenMoving(GetOwner(), true);
 	CollisionBox->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
 }
 
@@ -42,6 +42,7 @@ void AProjectile::Tick(float DeltaTime) {
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                         FVector NormalImpulse, const FHitResult& Hit) {
+
 	ShowImpactParticles(HitComp, OtherActor);
 	PlayImpactSound();
 	Destroy();
@@ -57,13 +58,13 @@ void AProjectile::ShowImpactParticles(UPrimitiveComponent* HitComponent, AActor*
 	UStaticMeshComponent* MeshComp = Cast<UStaticMeshComponent>(OtherActor->GetComponentByClass(UStaticMeshComponent::StaticClass()));
 	if(MeshComp) {
 		UMaterialInterface* Material = MeshComp->GetMaterial(0);
-		if (Material) {
+		if(Material) {
 			UPhysicalMaterial* PhysicalMaterialFromVisual = Material->GetPhysicalMaterial();
-			if (PhysicalMaterialFromVisual) {
-				EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(PhysicalMaterialFromVisual); 
-				if (SurfaceType == SurfaceType_Metal && MetalImpactParticle) {
+			if(PhysicalMaterialFromVisual) {
+				EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(PhysicalMaterialFromVisual);
+				if(SurfaceType == SurfaceType_Metal && MetalImpactParticle) {
 					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MetalImpactParticle, GetActorLocation(), FRotator(0.f), true);
-				} else if (SurfaceType == SurfaceType_Wood && WoodImpactParticle) {
+				} else if(SurfaceType == SurfaceType_Wood && WoodImpactParticle) {
 					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), WoodImpactParticle, GetActorLocation(), FRotator(0.f), true);
 				}
 			}

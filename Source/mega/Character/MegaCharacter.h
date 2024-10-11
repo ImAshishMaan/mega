@@ -8,6 +8,7 @@
 #include "mega/MegaComponents/CombatComponent.h"
 #include "MegaCharacter.generated.h"
 
+class UAbilityComponent;
 class UAttributeComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -25,10 +26,10 @@ public:
 	AMegaCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+
 	// To Initialize all Character Components and components variables
 	virtual void PostInitializeComponents() override;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* MoveAction;
 
@@ -66,6 +67,9 @@ public:
 	UInputAction* SecondaryWeaponAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* QAbilityAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	void AddMappingContext();
@@ -86,13 +90,12 @@ public:
 	void PrimaryWeaponButtonPressed();
 	void SecondaryWeaponButtonPressed();
 	void ChangePOVButtonPressed();
-	
+	void QAbilityButtonPressed();
 
 protected:
 	virtual void BeginPlay() override;
 
 public:
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* CombatComponent;
 
@@ -111,6 +114,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAttributeComponent* AttributeComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UAbilityComponent* AbilityComponent;
+
 private:
 	UPROPERTY()
 	AWeapon* OverlappingWeapon;
@@ -120,5 +126,4 @@ public:
 	bool IsWeaponEquipped();
 
 	FORCEINLINE AWeapon* GetEquippedWeapon() { return CombatComponent->EquippedWeapon; }
-	
 };
