@@ -11,14 +11,14 @@
 #include "mega/Weapon/Weapon.h"
 
 UCombatComponent::UCombatComponent() {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
-
-void UCombatComponent::BeginPlay() {
-	Super::BeginPlay();
+void UCombatComponent::InitializeCombatSystem() {
 	if(MegaCharacter) MegaMovementComponent = MegaCharacter->GetCharacterMovement();
-
+	
+	ensureMsgf(MegaMovementComponent, TEXT("No CharacterMovementComponent on %s"), *MegaCharacter->GetName());
+	
 	SetCharacterStates();
 	UpdateCharacterStateWithSettings(CurrentState);
 	SetAnimLayer(EEquipped::UnEquipped);
@@ -85,45 +85,22 @@ void UCombatComponent::SetGroundDistance() {
 }
 
 void UCombatComponent::SetCharacterStates() {
-	FCharacterSettings JoggingSettings;
-	JoggingSettings.MaxWalkSpeed = 800.f;
-	JoggingSettings.MaxAcceleration = 800.f;
-	JoggingSettings.BrakingDeceleration = 1200.f;
-	JoggingSettings.BrakingFrictionFactor = 1.0f;
-	JoggingSettings.BrakingFriction = 0.0f;
-	JoggingSettings.bUseSeparateBrakingFriction = true;
-
-	FCharacterSettings WalkingSettings;
-	WalkingSettings.MaxWalkSpeed = 250.f;
-	WalkingSettings.MaxAcceleration = 250.f;
-	WalkingSettings.BrakingDeceleration = 1000.f;
-	WalkingSettings.BrakingFrictionFactor = 1.0f;
-	WalkingSettings.BrakingFriction = 0.0f;
-	WalkingSettings.bUseSeparateBrakingFriction = true;
-
-	FCharacterSettings CrouchingSettings;
-	CrouchingSettings.MaxWalkSpeed = 250.f;
-	CrouchingSettings.MaxAcceleration = 250.f;
-	CrouchingSettings.BrakingDeceleration = 1000.f;
-	CrouchingSettings.BrakingFrictionFactor = 1.0f;
-	CrouchingSettings.BrakingFriction = 0.0f;
-	CrouchingSettings.bUseSeparateBrakingFriction = true;
-
-	StateSettingsMap.Add(ECharacterState::Jogging, JoggingSettings);
-	StateSettingsMap.Add(ECharacterState::Walking, WalkingSettings);
-	StateSettingsMap.Add(ECharacterState::Crouching, CrouchingSettings);
+	StateSettingsMap.Add(ECharacterState::Jogging, FCharacterSettings(800.f, 800.f, 1200.f, 1.0f, 0.0f, true));
+	StateSettingsMap.Add(ECharacterState::Walking, FCharacterSettings(250.f, 250.f, 1000.f, 1.0f, 0.0f, true));
+	StateSettingsMap.Add(ECharacterState::Crouching, FCharacterSettings(250.f, 250.f, 1000.f, 1.0f, 0.0f, true));
 }
 
 void UCombatComponent::UpdateCharacterStateWithSettings(ECharacterState NewState) {
 	CurrentState = NewState;
-	FCharacterSettings NewSettings = StateSettingsMap[NewState];
-
-	MegaMovementComponent->MaxWalkSpeed = NewSettings.MaxWalkSpeed;
-	MegaMovementComponent->MaxAcceleration = NewSettings.MaxAcceleration;
-	MegaMovementComponent->BrakingDecelerationWalking = NewSettings.BrakingDeceleration;
-	MegaMovementComponent->BrakingFrictionFactor = NewSettings.BrakingFrictionFactor;
-	MegaMovementComponent->BrakingFriction = NewSettings.BrakingFriction;
-	MegaMovementComponent->bUseSeparateBrakingFriction = NewSettings.bUseSeparateBrakingFriction;
+	if(StateSettingsMap.Find(NewState)) {
+		FCharacterSettings NewSettings = StateSettingsMap[NewState];
+		MegaMovementComponent->MaxWalkSpeed = NewSettings.MaxWalkSpeed;
+		MegaMovementComponent->MaxAcceleration = NewSettings.MaxAcceleration;
+		MegaMovementComponent->BrakingDecelerationWalking = NewSettings.BrakingDeceleration;
+		MegaMovementComponent->BrakingFrictionFactor = NewSettings.BrakingFrictionFactor;
+		MegaMovementComponent->BrakingFriction = NewSettings.BrakingFriction;
+		MegaMovementComponent->bUseSeparateBrakingFriction = NewSettings.bUseSeparateBrakingFriction;
+	}
 
 	if(NewState == ECharacterState::Jogging) {
 		SetJogState();

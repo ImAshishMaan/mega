@@ -64,6 +64,16 @@ struct FCharacterSettings {
 		  BrakingFrictionFactor(1.0f),
 		  BrakingFriction(0.0f),
 		  bUseSeparateBrakingFriction(true) {}
+
+	FCharacterSettings(float InMaxWalkSpeed, float InMaxAcceleration, float InBrakingDeceleration, 
+					   float InBrakingFrictionFactor, float InBrakingFriction, bool bInUseSeparateBrakingFriction)
+		: MaxWalkSpeed(InMaxWalkSpeed),
+		  MaxAcceleration(InMaxAcceleration),
+		  BrakingDeceleration(InBrakingDeceleration),
+		  BrakingFrictionFactor(InBrakingFrictionFactor),
+		  BrakingFriction(InBrakingFriction),
+		  bUseSeparateBrakingFriction(bInUseSeparateBrakingFriction) {}
+
 };
 
 USTRUCT(BlueprintType)

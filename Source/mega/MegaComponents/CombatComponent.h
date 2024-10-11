@@ -80,7 +80,13 @@ public:
 	
 
 protected:
-	virtual void BeginPlay() override;
+	/*
+	 * Combat System Initialization
+	 * It's called from MegaCharacter.cpp (It's like a BeginPlay)
+	 * Cannot use BeginPlay because combat BeginPlay might be called before character able to initialize some values in CombatComponent
+	 */
+	void InitializeCombatSystem();
+	
 	void StartTrace();
 
 private:

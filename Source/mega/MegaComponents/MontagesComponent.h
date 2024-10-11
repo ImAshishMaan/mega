@@ -21,7 +21,12 @@ public:
 	void PlayReloadMontage();
 
 protected:
-	virtual void BeginPlay() override;
+	/*
+	 * Montages System Initialization
+	 * It's called from MegaCharacter.cpp (It's like a BeginPlay)
+	 * Cannot use BeginPlay because montage BeginPlay might be called before character able to initialize some values in MontagesComponent
+	 */
+	void InitializeMontagesSystem();
 
 private:
 	UPROPERTY()

@@ -6,6 +6,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "mega/MegaComponents/AttributeComponent.h"
 #include "mega/MegaComponents/CombatComponent.h"
 #include "mega/MegaComponents/MontagesComponent.h"
 #include "mega/PlayerController/MegaPlayerController.h"
@@ -32,14 +33,13 @@ AMegaCharacter::AMegaCharacter() {
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	MontagesComponent = CreateDefaultSubobject<UMontagesComponent>(TEXT("MontagesComponent"));
-	
+	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
 }
 
 
 void AMegaCharacter::BeginPlay() {
 	Super::BeginPlay();
 	AddMappingContext();
-	
 }
 
 void AMegaCharacter::SetOverlappingWeapon(AWeapon* Weapon) {
@@ -74,14 +74,22 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Completed, this, &AMegaCharacter::StopWalking);
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Crouch);
 		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &AMegaCharacter::Equip);
-		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AMegaCharacter::AimButtonPressed);
-		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AMegaCharacter::AimButtonReleased);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AMegaCharacter::FireButtonPressed);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AMegaCharacter::FireButtonReleased);
-		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ReloadButtonPressed);
-		EnhancedInputComponent->BindAction(PrimaryWeaponAction, ETriggerEvent::Triggered, this, &AMegaCharacter::PrimaryWeaponButtonPressed);
-		EnhancedInputComponent->BindAction(SecondaryWeaponAction, ETriggerEvent::Triggered, this, &AMegaCharacter::SecondaryWeaponButtonPressed);
-		EnhancedInputComponent->BindAction(ChangePOVAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ChangePOVButtonPressed);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this,
+		                                   &AMegaCharacter::AimButtonPressed);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this,
+		                                   &AMegaCharacter::AimButtonReleased);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this,
+		                                   &AMegaCharacter::FireButtonPressed);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this,
+		                                   &AMegaCharacter::FireButtonReleased);
+		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this,
+		                                   &AMegaCharacter::ReloadButtonPressed);
+		EnhancedInputComponent->BindAction(PrimaryWeaponAction, ETriggerEvent::Triggered, this,
+		                                   &AMegaCharacter::PrimaryWeaponButtonPressed);
+		EnhancedInputComponent->BindAction(SecondaryWeaponAction, ETriggerEvent::Triggered, this,
+		                                   &AMegaCharacter::SecondaryWeaponButtonPressed);
+		EnhancedInputComponent->BindAction(ChangePOVAction, ETriggerEvent::Triggered, this,
+		                                   &AMegaCharacter::ChangePOVButtonPressed);
 	}
 }
 
@@ -90,12 +98,20 @@ void AMegaCharacter::PostInitializeComponents() {
 
 	if(CombatComponent) {
 		CombatComponent->MegaCharacter = this;
-		CombatComponent->MegaPlayerController = Cast<AMegaPlayerController>(GetController());
+		CombatComponent->MegaPlayerController = Cast<AMegaPlayerController>(GetController());;
 		CombatComponent->MontagesComponent = MontagesComponent;
+		CombatComponent->InitializeCombatSystem();
 	}
 	if(MontagesComponent) {
 		MontagesComponent->MegaCharacter = this;
 		MontagesComponent->CombatComponent = CombatComponent;
+		MontagesComponent->InitializeMontagesSystem();
+	}
+
+	if(AttributeComponent) {
+		AttributeComponent->MegaCharacter = this;
+		AttributeComponent->MegaPlayerController = Cast<AMegaPlayerController>(GetController());
+		AttributeComponent->InitializeAttributesSystem();
 	}
 }
 
@@ -126,15 +142,17 @@ void AMegaCharacter::StartWalking() {
 		CombatComponent->UpdateCharacterStateWithSettings(ECharacterState::Walking);
 	}
 }
+
 void AMegaCharacter::StopWalking() {
 	if(CombatComponent) {
 		CombatComponent->UpdateCharacterStateWithSettings(ECharacterState::Jogging);
 	}
 }
+
 void AMegaCharacter::Crouch() {
 	if(CombatComponent && CombatComponent->CurrentState != ECharacterState::Crouching) {
 		CombatComponent->UpdateCharacterStateWithSettings(ECharacterState::Crouching);
-	}else {
+	} else {
 		CombatComponent->UpdateCharacterStateWithSettings(ECharacterState::Jogging);
 	}
 }
@@ -153,20 +171,23 @@ void AMegaCharacter::Equip() {
 		if(OverlappingWeapon->GetWeaponType() == EWeaponType::EWT_Rifle && CombatComponent->PrimaryWeapon == nullptr) {
 			CombatComponent->SetAnimLayer(EEquipped::Rifle);
 			CombatComponent->EquipWeapon(OverlappingWeapon);
-		}else if(OverlappingWeapon->GetWeaponType() == EWeaponType::EWT_Rifle && CombatComponent->PrimaryWeapon != nullptr) {
+		} else if(OverlappingWeapon->GetWeaponType() == EWeaponType::EWT_Rifle && CombatComponent->PrimaryWeapon !=
+			nullptr) {
 			// TODO: swap weapons
 			UE_LOG(LogTemp, Warning, TEXT("Rifle already equipped: TODO : swap weapons"));
 		}
-		if(OverlappingWeapon->GetWeaponType() == EWeaponType::EWT_Pistol && CombatComponent->SecondaryWeapon == nullptr) {
+		if(OverlappingWeapon->GetWeaponType() == EWeaponType::EWT_Pistol && CombatComponent->SecondaryWeapon ==
+			nullptr) {
 			CombatComponent->SetAnimLayer(EEquipped::Pistol);
 			CombatComponent->EquipWeapon(OverlappingWeapon);
-		}else if(OverlappingWeapon->GetWeaponType() == EWeaponType::EWT_Pistol && CombatComponent->SecondaryWeapon != nullptr) {
+		} else if(OverlappingWeapon->GetWeaponType() == EWeaponType::EWT_Pistol && CombatComponent->SecondaryWeapon !=
+			nullptr) {
 			// TODO: swap weapons
 			UE_LOG(LogTemp, Warning, TEXT("Pistol already equipped: TODO : swap weapons"));
 		}
-		
+
 		OverlappingWeapon = nullptr;
-	}else if(CombatComponent && CombatComponent->EquippedWeapon) {
+	} else if(CombatComponent && CombatComponent->EquippedWeapon) {
 		CombatComponent->SetAnimLayer(EEquipped::UnEquipped);
 		CombatComponent->DropWeapon();
 	}
@@ -178,6 +199,7 @@ void AMegaCharacter::AimButtonPressed() {
 		CombatComponent->SetAimButtonPressed(true);
 	}
 }
+
 void AMegaCharacter::AimButtonReleased() {
 	if(CombatComponent) {
 		CombatComponent->UpdateCharacterStateWithSettings(ECharacterState::Jogging);
@@ -190,6 +212,7 @@ void AMegaCharacter::FireButtonPressed() {
 		CombatComponent->FireButtonPressed(true);
 	}
 }
+
 void AMegaCharacter::FireButtonReleased() {
 	if(CombatComponent) {
 		CombatComponent->FireButtonPressed(false);
@@ -204,7 +227,8 @@ void AMegaCharacter::ReloadButtonPressed() {
 
 void AMegaCharacter::PrimaryWeaponButtonPressed() {
 	if(CombatComponent) {
-		if(CombatComponent->PrimaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->GetWeaponType() == CombatComponent->PrimaryWeapon->GetWeaponType()) {
+		if(CombatComponent->PrimaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->
+			GetWeaponType() == CombatComponent->PrimaryWeapon->GetWeaponType()) {
 			CombatComponent->SetAnimLayer(EEquipped::UnEquipped);
 			CombatComponent->HolsterWeapon();
 		} else if(CombatComponent->PrimaryWeapon) {
@@ -213,9 +237,11 @@ void AMegaCharacter::PrimaryWeaponButtonPressed() {
 		}
 	}
 }
+
 void AMegaCharacter::SecondaryWeaponButtonPressed() {
 	if(CombatComponent) {
-		if(CombatComponent->SecondaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->GetWeaponType() == CombatComponent->SecondaryWeapon->GetWeaponType()) {
+		if(CombatComponent->SecondaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->
+			GetWeaponType() == CombatComponent->SecondaryWeapon->GetWeaponType()) {
 			CombatComponent->SetAnimLayer(EEquipped::UnEquipped);
 			CombatComponent->HolsterWeapon();
 		} else if(CombatComponent->SecondaryWeapon) {

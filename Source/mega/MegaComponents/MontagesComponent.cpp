@@ -7,9 +7,8 @@ UMontagesComponent::UMontagesComponent() {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-
-void UMontagesComponent::BeginPlay() {
-	Super::BeginPlay();
+void UMontagesComponent::InitializeMontagesSystem() {
+	
 }
 
 void UMontagesComponent::PlayFireMontage() {

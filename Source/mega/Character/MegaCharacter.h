@@ -8,6 +8,7 @@
 #include "mega/MegaComponents/CombatComponent.h"
 #include "MegaCharacter.generated.h"
 
+class UAttributeComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UMontagesComponent;
@@ -27,7 +28,6 @@ public:
 	
 	// To Initialize all Character Components and components variables
 	virtual void PostInitializeComponents() override;
-
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* MoveAction;
@@ -107,6 +107,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UMontagesComponent* MontagesComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UAttributeComponent* AttributeComponent;
 
 private:
 	UPROPERTY()
