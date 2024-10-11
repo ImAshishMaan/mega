@@ -98,7 +98,6 @@ void AMegaCharacter::PostInitializeComponents() {
 
 	if(CombatComponent) {
 		CombatComponent->MegaCharacter = this;
-		CombatComponent->MegaPlayerController = Cast<AMegaPlayerController>(GetController());;
 		CombatComponent->MontagesComponent = MontagesComponent;
 		CombatComponent->InitializeCombatSystem();
 	}
@@ -110,7 +109,6 @@ void AMegaCharacter::PostInitializeComponents() {
 
 	if(AttributeComponent) {
 		AttributeComponent->MegaCharacter = this;
-		AttributeComponent->MegaPlayerController = Cast<AMegaPlayerController>(GetController());
 		AttributeComponent->InitializeAttributesSystem();
 	}
 }
