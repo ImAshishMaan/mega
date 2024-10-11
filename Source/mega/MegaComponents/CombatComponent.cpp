@@ -11,7 +11,7 @@
 #include "mega/Weapon/Weapon.h"
 
 UCombatComponent::UCombatComponent() {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UCombatComponent::InitializeCombatSystem() {
@@ -216,13 +216,16 @@ void UCombatComponent::FireTimerFinished() {
 
 void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult) {
 	FVector2D ViewportSize;
-	if(GEngine && GEngine->GameViewport) {
+	if (GEngine && GEngine->GameViewport) {
 		GEngine->GameViewport->GetViewportSize(ViewportSize);
 	}
 
+	// Get the crosshair location in the middle of the screen
 	FVector2D CrosshairLocation(ViewportSize.X / 2.0f, ViewportSize.Y / 2.0f);
 	FVector CrosshairWorldPosition;
 	FVector CrosshairWorldDirection;
+
+	// Deproject the crosshair screen location to world space
 	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
 		UGameplayStatics::GetPlayerController(this, 0),
 		CrosshairLocation,
@@ -230,20 +233,18 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult) {
 		CrosshairWorldDirection
 	);
 
-	if(bScreenToWorld) {
+	if (bScreenToWorld) {
+		// Start trace from the crosshair world position or character's location
 		FVector Start = CrosshairWorldPosition;
-		if(MegaCharacter) {
-			float DistanceToCharacter = (MegaCharacter->GetActorLocation() - Start).Size();
-			// to start trace from front of character
-			Start += CrosshairWorldDirection * (DistanceToCharacter + 100.0f);
-			//DrawDebugSphere(GetWorld(), Start, 16.0f, 12, FColor::Red, false);
-		}
+
+		// The trace end point far ahead in the direction of the crosshair
 		FVector End = Start + CrosshairWorldDirection * 80000.0f;
 
-		// Ignore character
+		// Ignore the character for the trace
 		FCollisionQueryParams TracerParams;
 		TracerParams.AddIgnoredActor(MegaCharacter);
-		
+
+		// Perform the trace
 		GetWorld()->LineTraceSingleByChannel(
 			TraceHitResult,
 			Start,
@@ -251,5 +252,10 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult) {
 			ECollisionChannel::ECC_Visibility,
 			TracerParams
 		);
+
+		// If no hit was found, set the trace hit result's ImpactPoint to the end point
+		if (!TraceHitResult.bBlockingHit) {
+			TraceHitResult.ImpactPoint = End;  // This ensures the bullet goes in the crosshair direction
+		}
 	}
 }

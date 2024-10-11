@@ -1,4 +1,29 @@
 #include "MegaHUD.h"
+#include "CharacterOverlayWidget.h"
+#include "GameFramework/PlayerController.h"
+#include "Blueprint/UserWidget.h"
+
+void AMegaHUD::BeginPlay() {
+	Super::BeginPlay();
+
+	InitOverlays();
+	AddCharacterOverlay();
+}
+
+void AMegaHUD::InitOverlays() {
+	APlayerController* PlayerController = GetOwningPlayerController();
+	if(PlayerController) {
+		if(CharacterOverlayClass && CharacterOverlay == nullptr) {
+			CharacterOverlay = CreateWidget<UCharacterOverlayWidget>(PlayerController, CharacterOverlayClass);
+		}
+	}
+}
+
+void AMegaHUD::AddCharacterOverlay() {
+	if(CharacterOverlay) {
+		CharacterOverlay->AddToViewport();
+	}
+}
 
 void AMegaHUD::DrawHUD() {
 	Super::DrawHUD();

@@ -5,6 +5,7 @@
 #include "mega/Enums.h"
 #include "MegaHUD.generated.h"
 
+class UCharacterOverlayWidget;
 class UTexture2D;
 
 UCLASS()
@@ -14,8 +15,23 @@ class MEGA_API AMegaHUD : public AHUD {
 public:
 	virtual void DrawHUD() override;
 
+	void InitOverlays();
+
+	UPROPERTY(EditAnywhere, Category = "Overlays")
+	TSubclassOf<UUserWidget> CharacterOverlayClass;
+
+	UPROPERTY()
+	UCharacterOverlayWidget* CharacterOverlay;
+
 	/*
-	 * Crosshairs
+	 * Add Overlays to Viewport
+	 */
+
+	void AddCharacterOverlay();
+	
+
+	/*
+	 * Default Cross-hairs
 	 * TODO: Need to move this somewhere else
 	 */
 
@@ -37,7 +53,8 @@ public:
 	/*
 	 * 
 	 */
-	
+protected:
+	virtual void BeginPlay() override;
 
 private:
 	FHUDPackage HUDPackage;
