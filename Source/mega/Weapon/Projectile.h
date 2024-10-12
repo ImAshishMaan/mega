@@ -13,8 +13,11 @@ class MEGA_API AProjectile : public AActor {
 
 public:
 	AProjectile();
-	virtual void Tick(float DeltaTime) override;
 	void ShowImpactParticles(UPrimitiveComponent* HitComponent,  AActor* OtherActor);
+
+	void ResetProjectile();
+	void ActivateProjectile();
+	bool IsActive() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -52,5 +55,11 @@ private:
 
 	UPROPERTY()
 	UParticleSystemComponent* TracerComponent;
+
+	bool bInUse;
+
+public:
+
+	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 	
 };

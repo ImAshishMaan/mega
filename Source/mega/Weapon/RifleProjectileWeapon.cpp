@@ -2,6 +2,8 @@
 
 #include "Projectile.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "mega/PoolingSystem/ProjectilePoolManager.h"
 
 void ARifleProjectileWeapon::Fire(const FVector& HitTarget) {
 	Super::Fire(HitTarget);
@@ -14,8 +16,30 @@ void ARifleProjectileWeapon::Fire(const FVector& HitTarget) {
 		FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
 
 		const FVector ToTarget = HitTarget - SocketTransform.GetLocation();
-		FRotator TargetRotaion = ToTarget.Rotation();
-		checkf(ProjectileClass, TEXT("Projectile class not set."));
+		FRotator TargetRotation = ToTarget.Rotation();
+
+		AProjectilePoolManager* PoolManager = AProjectilePoolManager::GetInstance();
+		if(PoolManager && InstigatorPawn) {
+			AProjectile* Projectile = PoolManager->GetProjectile();
+			if(Projectile) {
+				Projectile->SetActorLocation(SocketTransform.GetLocation());
+				Projectile->SetActorRotation(TargetRotation);
+				Projectile->SetOwner(GetOwner());
+				Projectile->SetInstigator(InstigatorPawn);
+
+				// Reinitialize movement
+				UProjectileMovementComponent* ProjectileMovement = Projectile->GetProjectileMovement();
+				if(ProjectileMovement) {
+					// Set the velocity in the direction of the target
+					ProjectileMovement->Velocity = TargetRotation.Vector() * 20000.0f;
+					ProjectileMovement->Activate(true); // Ensure the movement component is activated
+				}
+
+				// Activate the projectile
+				Projectile->ActivateProjectile();
+			}
+		}
+		/*checkf(ProjectileClass, TEXT("Projectile class not set."));
 		if(ProjectileClass && InstigatorPawn) {
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Instigator = InstigatorPawn;
@@ -26,10 +50,10 @@ void ARifleProjectileWeapon::Fire(const FVector& HitTarget) {
 				AProjectile* Projectile = World->SpawnActor<AProjectile>(
 					ProjectileClass,
 					SocketTransform.GetLocation(),
-					TargetRotaion,
+					TargetRotation,
 					SpawnParams
 				);
 			}
-		}
+		}*/
 	}
 }

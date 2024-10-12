@@ -1,12 +1,13 @@
 #include "Projectile.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "mega/mega.h"
+#include "mega/PoolingSystem/ProjectilePoolManager.h"
 #include "Sound/SoundCue.h"
 
 AProjectile::AProjectile() {
-	PrimaryActorTick.bCanEverTick = true;
-
+	PrimaryActorTick.bCanEverTick = false;
 
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	SetRootComponent(CollisionBox);
@@ -17,6 +18,13 @@ AProjectile::AProjectile() {
 	CollisionBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	CollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	CollisionBox->SetCollisionResponseToChannel(ECC_SkeletalMesh, ECR_Block);
+
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
+	ProjectileMovement->InitialSpeed = 30000.0f;
+	ProjectileMovement->MaxSpeed = 30000.0f;
+	ProjectileMovement->bRotationFollowsVelocity = true;
+	ProjectileMovement->bShouldBounce = false;
+	ProjectileMovement->ProjectileGravityScale = 0.0f;
 }
 
 void AProjectile::BeginPlay() {
@@ -36,16 +44,46 @@ void AProjectile::BeginPlay() {
 	CollisionBox->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
 }
 
-void AProjectile::Tick(float DeltaTime) {
-	Super::Tick(DeltaTime);
-}
-
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                         FVector NormalImpulse, const FHitResult& Hit) {
 
 	ShowImpactParticles(HitComp, OtherActor);
 	PlayImpactSound();
-	Destroy();
+	//Destroy();
+
+	AProjectilePoolManager* PoolManager = AProjectilePoolManager::GetInstance();
+	if (PoolManager) {
+		PoolManager->ReturnProjectile(this);
+	}
+}
+
+void AProjectile::ResetProjectile() {
+	bInUse = false;
+
+	// Reset movement and state
+	if (ProjectileMovement) {
+		ProjectileMovement->StopMovementImmediately();
+		ProjectileMovement->Velocity = FVector::ZeroVector;  // Reset velocity
+	}
+
+	SetActorHiddenInGame(true);   // Hide the projectile
+	SetActorEnableCollision(false);  // Disable collision
+
+	SetActorLocation(FVector::ZeroVector); 
+}
+
+void AProjectile::ActivateProjectile() {
+	bInUse = true;
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+
+	if (ProjectileMovement) {
+		ProjectileMovement->Activate(true);  // Reactivate the movement component
+	}
+}
+
+bool AProjectile::IsActive() const {
+	return bInUse;
 }
 
 void AProjectile::PlayImpactSound() {

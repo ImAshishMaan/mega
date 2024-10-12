@@ -36,6 +36,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
 	TSubclassOf<AProjectile> ProjectileClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	FPrimaryAssetId ProjectileAssetId;
+
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
 
