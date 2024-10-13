@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "SAICharacter.generated.h"
 
+class UHealthBarWIdget;
 class UAttributeComponent;
 class UPawnSensingComponent;
 
@@ -26,7 +27,15 @@ protected:
 	UFUNCTION()
 	void OnPawnSeen(APawn* SeenPawn);
 	
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UAttributeComponent* OwningComp, float NewHealth, float MaxHealth, float Damage);
+	
 private:
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
+
+	UHealthBarWIdget* ActiveHealthBar;
 
 	
 };
