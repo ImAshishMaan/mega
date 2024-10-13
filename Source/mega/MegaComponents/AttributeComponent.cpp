@@ -1,7 +1,5 @@
 #include "AttributeComponent.h"
 
-#include "mega/Character/MegaCharacter.h"
-#include "mega/PlayerController/MegaPlayerController.h"
 
 UAttributeComponent::UAttributeComponent() {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -10,24 +8,24 @@ UAttributeComponent::UAttributeComponent() {
 	MaxHealth = 100.0f;
 }
 
-void UAttributeComponent::InitializeAttributesSystem() {
-	if(MegaCharacter) {
-		MegaCharacter->OnTakeAnyDamage.AddDynamic(this, &UAttributeComponent::OnTakeAnyDamage);
+bool UAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Damage) {
+	if(!GetOwner()->CanBeDamaged() && Damage < 0.0f) {
+		return false;
 	}
-}
 
-void UAttributeComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
-                                          AController* InstigatedBy, AActor* DamageCauser) {
-
-	float OldHealth = Health;
 	Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
-	UE_LOG(LogTemp, Warning, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
-	// can call OnHealthChanged event here to send data
-	MegaPlayerController = MegaPlayerController == nullptr ? Cast<AMegaPlayerController>(MegaCharacter->Controller) : MegaPlayerController;
-	if(MegaPlayerController) {
-		MegaPlayerController->SetHUDHealth(Health, MaxHealth);
-	}
-	// call HUD health update
-	// call hit react montage here
+	OnHealthChanged.Broadcast(InstigatorActor, this, Health, MaxHealth);
+
+	// If actor is dead call OnActorDead in GM
+
+	return true;
 }
+
+UAttributeComponent* UAttributeComponent::GetAttributes(AActor* FromActor) {
+	if(FromActor) {
+		return FromActor->FindComponentByClass<UAttributeComponent>();
+	}
+	return nullptr;
+}
+
 

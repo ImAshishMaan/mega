@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "SAICharacter.generated.h"
 
+class UAttributeComponent;
 class UPawnSensingComponent;
 
 UCLASS()
@@ -18,6 +19,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UPawnSensingComponent* PawnSensingComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "AI")
+	UAttributeComponent* AttributeComp;
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* SeenPawn);

@@ -2,12 +2,14 @@
 
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "mega/MegaComponents/AttributeComponent.h"
 #include "Perception/PawnSensingComponent.h"
 
 ASAICharacter::ASAICharacter() {
 	PrimaryActorTick.bCanEverTick = true;
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComp"));
+	AttributeComp = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComp"));
 	
 }
 

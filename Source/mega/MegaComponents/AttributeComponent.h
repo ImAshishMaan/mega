@@ -4,6 +4,8 @@
 #include "Components/ActorComponent.h"
 #include "AttributeComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, UAttributeComponent*, OwningComp, float, NewHealth, float, MaxHealth);
+
 class AMegaCharacter;
 class AMegaPlayerController;
 
@@ -12,16 +14,12 @@ class MEGA_API UAttributeComponent : public UActorComponent {
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	static UAttributeComponent* GetAttributes(AActor* FromActor);
+	
 	UAttributeComponent();
-	friend class AMegaCharacter;
 
 protected:
-	/*
-	 * Attributes System Initialization
-	 * It's called from MegaCharacter.cpp (It's like a BeginPlay)
-	 * Cannot use BeginPlay because montage BeginPlay might be called before character able to initialize some values in AttributeComponent
-	 */
-	void InitializeAttributesSystem();
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
 	float Health;
@@ -29,17 +27,13 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
 	float MaxHealth;
 	
-private:
-	UPROPERTY()
-	AMegaCharacter* MegaCharacter;
-
-	UPROPERTY()
-	AMegaPlayerController* MegaPlayerController;
-
-	UFUNCTION()
-	void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
-
 public:
+
+	UPROPERTY(BlueprintAssignable)
+	FOnHealthChanged OnHealthChanged;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool ApplyHealthChange(AActor* InstigatorActor, float Damage);
 
 	FORCEINLINE float GetHealth() const { return Health; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }

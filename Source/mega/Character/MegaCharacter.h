@@ -95,7 +95,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UAttributeComponent* OwningComp, float NewHealth, float MaxHealth);
+
+private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* CombatComponent;
 
@@ -117,7 +120,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAbilityComponent* AbilityComponent;
 
-private:
 	UPROPERTY()
 	AWeapon* OverlappingWeapon;
 

@@ -1,8 +1,7 @@
 #include "ProjectileBullet.h"
-
 #include "GameFramework/Character.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "Kismet/GameplayStatics.h"
+#include "mega/MegaComponents/AttributeComponent.h"
 
 AProjectileBullet::AProjectileBullet() {
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
@@ -15,9 +14,9 @@ void AProjectileBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 	FVector NormalImpulse, const FHitResult& Hit) {
 	ACharacter* BulletOwner = Cast<ACharacter>(GetOwner());
 	if(BulletOwner) {
-		AController* OwnerController = BulletOwner->GetController();
-		if(OwnerController) {
-			UGameplayStatics::ApplyDamage(OtherActor, Damage, OwnerController, BulletOwner, UDamageType::StaticClass());
+		UAttributeComponent* AttributeComp = UAttributeComponent::GetAttributes(OtherActor);
+		if(AttributeComp) {
+			AttributeComp->ApplyHealthChange(BulletOwner, Damage);
 		}
 	}
 

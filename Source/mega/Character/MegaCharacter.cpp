@@ -104,8 +104,7 @@ void AMegaCharacter::PostInitializeComponents() {
 	}
 
 	if(AttributeComponent) {
-		AttributeComponent->MegaCharacter = this;
-		AttributeComponent->InitializeAttributesSystem();
+		AttributeComponent->OnHealthChanged.AddDynamic(this, &AMegaCharacter::OnHealthChanged);
 	}
 	if(AbilityComponent) {
 		AbilityComponent->MegaCharacter = this;
@@ -268,3 +267,15 @@ void AMegaCharacter::QAbilityButtonPressed() {
 bool AMegaCharacter::IsWeaponEquipped() {
 	return (CombatComponent && CombatComponent->EquippedWeapon);
 }
+
+
+void AMegaCharacter::OnHealthChanged(AActor* InstigatorActor, UAttributeComponent* OwningComp, float NewHealth, float MaxHealth) {
+	/*
+	 * NOTE: I Can Do this With MegaPlayerController. OR I can also use dame Delegate directly in CharacterOverlayHealthBar
+	 */
+	AMegaPlayerController* MegaPlayerController = Cast<AMegaPlayerController>(GetController());
+	if(MegaPlayerController) {
+		MegaPlayerController->SetHUDHealth(NewHealth, MaxHealth);
+	}
+}
+
