@@ -269,9 +269,9 @@ bool AMegaCharacter::IsWeaponEquipped() {
 }
 
 
-void AMegaCharacter::OnHealthChanged(AActor* InstigatorActor, UAttributeComponent* OwningComp, float NewHealth, float MaxHealth) {
+void AMegaCharacter::OnHealthChanged(AActor* InstigatorActor, UAttributeComponent* OwningComp, float NewHealth, float MaxHealth, float Damage) {
 	/*
-	 * NOTE: I Can Do this With MegaPlayerController. OR I can also use dame Delegate directly in CharacterOverlayHealthBar
+	 * NOTE: I Can Do this With MegaPlayerController. OR I can also use same Delegate directly in CharacterOverlayHealthBar
 	 */
 	AMegaPlayerController* MegaPlayerController = Cast<AMegaPlayerController>(GetController());
 	if(MegaPlayerController) {

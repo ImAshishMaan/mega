@@ -14,7 +14,7 @@ bool UAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Damag
 	}
 
 	Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
-	OnHealthChanged.Broadcast(InstigatorActor, this, Health, MaxHealth);
+	OnHealthChanged.Broadcast(InstigatorActor, this, Health, MaxHealth, Damage);
 
 	// If actor is dead call OnActorDead in GM
 
