@@ -1,5 +1,4 @@
 #include "MagicProjectileBase.h"
-
 #include "Components/SphereComponent.h"
 #include "GameFramework/MovementComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -11,8 +10,6 @@ AMagicProjectileBase::AMagicProjectileBase() {
 	PrimaryActorTick.bCanEverTick = false;
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	SphereComp->SetCollisionProfileName(TEXT("MagicProjectile"));
-	SphereComp->OnComponentHit.AddDynamic(this, &AMagicProjectileBase::OnActorHIt);
 	RootComponent = SphereComp;
 
 	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("EffectComp"));
@@ -26,7 +23,14 @@ AMagicProjectileBase::AMagicProjectileBase() {
 
 	ForceComp = CreateDefaultSubobject<URadialForceComponent>(TEXT("ForceComp"));
 	ForceComp->SetupAttachment(SphereComp);
+
+}
+
+void AMagicProjectileBase::BeginPlay() {
+	Super::BeginPlay();
 	
+	SphereComp->IgnoreActorWhenMoving(GetOwner(), true);
+	SphereComp->OnComponentHit.AddDynamic(this, &AMagicProjectileBase::OnActorHIt);
 }
 
 void AMagicProjectileBase::PostInitializeComponents() {

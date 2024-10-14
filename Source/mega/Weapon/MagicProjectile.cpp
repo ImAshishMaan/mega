@@ -9,8 +9,6 @@
 
 AMagicProjectile::AMagicProjectile() {
 	SphereComp->SetSphereRadius(10.0f);
-	SphereComp->OnComponentHit.AddDynamic(this, &AMagicProjectile::OnActorHIt);
-
 	DamageAmount = 35.0f;
 }
 

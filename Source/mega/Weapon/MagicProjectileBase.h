@@ -17,6 +17,7 @@ public:
 	AMagicProjectileBase();
 
 protected:
+	void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	UParticleSystem* ImpactVFX;
