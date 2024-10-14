@@ -1,6 +1,9 @@
 #include "MegaAnimInstance.h"
+
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "mega/Weapon/Weapon.h"
 
 
 void UMegaAnimInstance::UpdateCharacterState_Implementation(ECharacterState NewState) {
@@ -32,6 +35,7 @@ void UMegaAnimInstance::NativeUpdateAnimation(float DeltaSeconds) {
 	SetLocomotionData();
 	SetCharacterStates();
 	SetRootYawOffset(DeltaSeconds);
+	SetWeaponSocketData();
 }
 
 void UMegaAnimInstance::SetVelocityData() {
@@ -91,6 +95,8 @@ void UMegaAnimInstance::SetLocationData(float DeltaTime) {
 	const float Target = DeltaActorYaw / DeltaTime;
 	const float Interp = FMath::FInterpTo(LeanAngle, Target, DeltaTime, 6.f);
 	LeanAngle = FMath::Clamp(Interp, -90.f, 90.f);
+
+	AimPitchOffset = UKismetMathLibrary::NormalizeAxis(TryGetPawnOwner()->GetBaseAimRotation().Pitch);
 	
 }
 
@@ -192,5 +198,12 @@ void UMegaAnimInstance::ProcessTurnYawCurve(float DeltaTime) {
 			float Target2 = RootYawOffset - Target;
 			RootYawOffset = UKismetMathLibrary::NormalizeAxis(Target2);
 		}
+	}
+}
+
+void UMegaAnimInstance::SetWeaponSocketData() {
+	bWeaponEquipped = OwnerCharacter->IsWeaponEquipped();
+	if(bWeaponEquipped && OwnerCharacter->GetEquippedWeapon() && OwnerCharacter->GetEquippedWeapon()->GetWeaponMesh()) {
+		LeftHandSocketLocation = OwnerCharacter->GetEquippedWeapon()->GetWeaponMesh()->GetSocketLocation(FName("LeftHandSocket"));
 	}
 }

@@ -5,51 +5,30 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
 #include "CoreMinimal.h"
-#include "mega/Interfaces/AnimationInterface.h"
+#include "mega/MegaComponents/CombatComponent.h"
 #include "MegaCharacter.generated.h"
 
+class UAbilityComponent;
+class UAttributeComponent;
+class UCameraComponent;
+class USpringArmComponent;
+class UMontagesComponent;
+class UCombatComponent;
 class UInputAction;
 class UInputMappingContext;
+class AWeapon;
 
 UCLASS()
-class MEGA_API AMegaCharacter : public ACharacter, public IAnimationInterface {
+class MEGA_API AMegaCharacter : public ACharacter {
 	GENERATED_BODY()
 
 public:
 	AMegaCharacter();
-	void SetWalkState();
-	void SetJogState();
-	void SetCrouchState();
-	void SetGroundDistance();
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	/*
-	 * Animation Layers Data 
-	 */
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AnimLayers")
-	EEquipped CurrentEquipped = EEquipped::UnEquipped;
-	EEquipped LastEquipped = EEquipped::Rifle;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AnimLayers")
-	TMap<EEquipped, TSubclassOf<UAnimInstance>> AnimInstanceMap;
-
-	void SetAnimLayer();
-
-	/*
-	 * 
-	 */
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterState")
-	ECharacterState CurrentState = ECharacterState::Jogging;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gate Settings")
-	TMap<ECharacterState, FCharacterSettings> StateSettingsMap;
-
-	UFUNCTION(BlueprintCallable)
-	void SetCharacterStates();
-
-	UFUNCTION(BlueprintCallable)
-	void UpdateCharacterStateWithSettings(ECharacterState NewState);
+	// To Initialize all Character Components and components variables
+	virtual void PostInitializeComponents() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* MoveAction;
@@ -61,21 +40,92 @@ public:
 	UInputAction* JumpAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* WalkAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* CrouchAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* EquipAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* AimAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* FireAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ReloadAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ChangePOVAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* PrimaryWeaponAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* SecondaryWeaponAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* QAbilityAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	void AddMappingContext();
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void StartWalking();
+	void StopWalking();
+	void Crouch();
 	void StartJumping();
 	virtual void StopJumping() override;
-	
+	void Equip();
+	void AimButtonPressed();
+	void AimButtonReleased();
+	void FireButtonPressed();
+	void FireButtonReleased();
+	void ReloadButtonPressed();
+	void PrimaryWeaponButtonPressed();
+	void SecondaryWeaponButtonPressed();
+	void ChangePOVButtonPressed();
+	void QAbilityButtonPressed();
 
 protected:
 	virtual void BeginPlay() override;
 
-public:
-	virtual void Tick(float DeltaTime) override;
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UAttributeComponent* OwningComp, float NewHealth, float MaxHealth, float Damage);
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCombatComponent* CombatComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* SpringArmComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FollowCameraTP;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FollowCameraFP;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UMontagesComponent* MontagesComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UAttributeComponent* AttributeComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UAbilityComponent* AbilityComponent;
+
+	UPROPERTY()
+	AWeapon* OverlappingWeapon;
+
+public:
+	void SetOverlappingWeapon(AWeapon* Weapon);
+	bool IsWeaponEquipped();
+
+	FORCEINLINE AWeapon* GetEquippedWeapon() { return CombatComponent->EquippedWeapon; }
 };

@@ -6,7 +6,10 @@
 UENUM(BlueprintType)
 enum class EEquipped : uint8 {
 	UnEquipped = 0,
-	Rifle = 1
+	Rifle = 1,
+	Pistol = 2,
+
+	MaxDefault = 3
 };
 
 UENUM(BlueprintType)
@@ -61,4 +64,27 @@ struct FCharacterSettings {
 		  BrakingFrictionFactor(1.0f),
 		  BrakingFriction(0.0f),
 		  bUseSeparateBrakingFriction(true) {}
+
+	FCharacterSettings(float InMaxWalkSpeed, float InMaxAcceleration, float InBrakingDeceleration, 
+					   float InBrakingFrictionFactor, float InBrakingFriction, bool bInUseSeparateBrakingFriction)
+		: MaxWalkSpeed(InMaxWalkSpeed),
+		  MaxAcceleration(InMaxAcceleration),
+		  BrakingDeceleration(InBrakingDeceleration),
+		  BrakingFrictionFactor(InBrakingFrictionFactor),
+		  BrakingFriction(InBrakingFriction),
+		  bUseSeparateBrakingFriction(bInUseSeparateBrakingFriction) {}
+
+};
+
+USTRUCT(BlueprintType)
+struct FHUDPackage {
+	GENERATED_BODY()
+
+public:
+	UTexture2D* CrosshairsCenter = nullptr;
+	UTexture2D* CrosshairsLeft = nullptr;
+	UTexture2D* CrosshairsRight	= nullptr;
+	UTexture2D* CrosshairsTop = nullptr;
+	UTexture2D* CrosshairsBottom = nullptr;
+	
 };
