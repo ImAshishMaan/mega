@@ -5,6 +5,7 @@
 #include "MagicProjectileBase.h"
 #include "MagicProjectile.generated.h"
 
+class UMaterialInterface;
 
 UCLASS()
 class MEGA_API AMagicProjectile : public AMagicProjectileBase {
@@ -18,10 +19,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	FGameplayTag ParryTag;
 
-	UFUNCTION()
-	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnActorHIt(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 
 public:
 	AMagicProjectile();
+
+	UPROPERTY(EditAnywhere, Category = "Decal")
+	UMaterialInterface* DecalMaterial;
+
+	void SpawnDecal(const FHitResult& ImpactResult);
 	
 };
