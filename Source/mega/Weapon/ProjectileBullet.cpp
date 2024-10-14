@@ -1,6 +1,8 @@
 #include "ProjectileBullet.h"
 
 #include "Components/DecalComponent.h"
+#include "Field/FieldSystemActor.h"
+#include "Field/FieldSystemComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -23,7 +25,7 @@ void AProjectileBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 		}
 	}
 
-	if(OtherActor && OtherActor != this && OtherActor != BulletOwner) {
+	/*if(OtherActor && OtherActor != this && OtherActor != BulletOwner) {
 		if(OtherComp && OtherComp->IsSimulatingPhysics() && OtherComp->GetMass() > 0.0f) {
 			// Remember to set object mass in the Physics Asset
 			float Mass = OtherComp->GetMass();
@@ -35,7 +37,27 @@ void AProjectileBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 
 			OtherComp->AddImpulseAtLocation(Impulse, Hit.ImpactPoint);
 		}
+	}*/
+
+	if(OtherComp && OtherComp->IsSimulatingPhysics()) {
+
+		if(FieldSystem) {
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+
+			FTransform SpawnTransform;
+			SpawnTransform.SetLocation(Hit.ImpactPoint);
+			SpawnTransform.SetRotation(FQuat::Identity);
+			SpawnTransform.SetScale3D(FVector(1.f, 1.f, 1.f));
+
+			// Spawn the field actor
+			AActor* SpawnedField = GetWorld()->SpawnActor<AActor>(FieldSystem, SpawnTransform, SpawnParams);
+			if(SpawnedField) {
+				SpawnedField->SetLifeSpan(.1f);
+			}
+		}
 	}
+
 	SpawnBulletHoles(Hit);
 
 	Super::OnHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
@@ -55,7 +77,7 @@ void AProjectileBullet::SpawnBulletHoles(const FHitResult& ImpactResult) {
 		);
 
 		if(DecalComponent) {
-			DecalComponent->SetFadeScreenSize(0.001f); 
+			DecalComponent->SetFadeScreenSize(0.001f);
 			//DecalComponent->SetFadeOut(2.f, 2.f); // Not working for some reason
 		}
 	}

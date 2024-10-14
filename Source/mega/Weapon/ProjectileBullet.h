@@ -5,6 +5,7 @@
 #include "ProjectileBullet.generated.h"
 
 class UMaterialInterface;
+class UFieldSystem;
 
 UCLASS()
 class MEGA_API AProjectileBullet : public AProjectile {
@@ -21,6 +22,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Decal")
 	UMaterialInterface* DecalMaterial;
 
+	UPROPERTY(EditAnywhere, Category = "Field")
+	TSubclassOf<AActor> FieldSystem;
+	
 	void SpawnBulletHoles(const FHitResult& ImpactResult);
 
 };
