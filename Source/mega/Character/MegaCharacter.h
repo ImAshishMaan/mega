@@ -119,9 +119,6 @@ private:
 	UAttributeComponent* AttributeComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UAbilityComponent* AbilityComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UActionComponent* ActionComponent;
 
 	UPROPERTY()

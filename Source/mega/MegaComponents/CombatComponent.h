@@ -99,9 +99,6 @@ private:
 	UMontagesComponent* MontagesComponent;
 
 	UPROPERTY()
-	UAbilityComponent* AbilityComponent;
-
-	UPROPERTY()
 	UCharacterMovementComponent* MegaMovementComponent;
 
 	UPROPERTY()
@@ -134,16 +131,6 @@ private:
 	// Target that are under crosshair live
 	FVector HitTarget;
 
-	/*
-	 * Magic Ability
-	 */
-	FTimerHandle MagicTimer;
-	bool bHaveMagicAbility = true;
-	bool bCanUseMagic = true;
-	void StartMagicTimer();
-	void MagicTimerFinished();
-	bool CanUseMagic();
-	void MagicAbility();
 
 public:
 	FORCEINLINE void SetAimButtonPressed(bool bPressed) { bAimButtonPressed = bPressed; }
