@@ -7,6 +7,7 @@
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "mega/MegaComponents/AbilityComponent.h"
+#include "mega/MegaComponents/ActionComponent.h"
 #include "mega/MegaComponents/AttributeComponent.h"
 #include "mega/MegaComponents/CombatComponent.h"
 #include "mega/MegaComponents/MontagesComponent.h"
@@ -36,6 +37,7 @@ AMegaCharacter::AMegaCharacter() {
 	MontagesComponent = CreateDefaultSubobject<UMontagesComponent>(TEXT("MontagesComponent"));
 	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
 	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("AbilityComponent"));
+	ActionComponent = CreateDefaultSubobject<UActionComponent>(TEXT("ActionComponent"));
 }
 
 
@@ -259,8 +261,11 @@ void AMegaCharacter::ChangePOVButtonPressed() {
 }
 
 void AMegaCharacter::QAbilityButtonPressed() {
-	if(CombatComponent) {
+	/*if(CombatComponent) {
 		CombatComponent->MagicAbility();
+	}*/
+	if(ActionComponent) {
+		ActionComponent->StartActionByName(this, "MagicProjectile");
 	}
 }
 
