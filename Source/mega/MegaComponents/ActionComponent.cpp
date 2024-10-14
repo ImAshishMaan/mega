@@ -67,3 +67,11 @@ bool UActionComponent::StopActionByName(AActor* Instigator, FName ActionName) {
 	}
 	return false;
 }
+
+UActionComponent* UActionComponent::GetActionComponent(AActor* Actor) {
+	if(Actor) {
+		return Actor->FindComponentByClass<UActionComponent>();
+	}
+	return nullptr;
+}
+

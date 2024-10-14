@@ -41,4 +41,6 @@ protected:
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	static UActionComponent *GetActionComponent(AActor *Actor);
 };

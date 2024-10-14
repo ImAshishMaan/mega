@@ -254,9 +254,6 @@ void AMegaCharacter::ChangePOVButtonPressed() {
 }
 
 void AMegaCharacter::QAbilityButtonPressed() {
-	/*if(CombatComponent) {
-		CombatComponent->MagicAbility();
-	}*/
 	if(ActionComponent) {
 		ActionComponent->StartActionByName(this, "MagicProjectile");
 	}
