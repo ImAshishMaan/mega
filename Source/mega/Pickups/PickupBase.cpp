@@ -16,6 +16,7 @@ APickupBase::APickupBase() {
 	SphereOverlapComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SphereOverlapComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SphereOverlapComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	SphereOverlapComp->AddLocalOffset(FVector(0.f, 0.f, 45.f));
 
 	PickupMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("PickupMeshComp");
 	PickupMeshComp->SetupAttachment(SphereOverlapComp);
