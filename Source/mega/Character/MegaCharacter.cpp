@@ -6,7 +6,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "mega/MegaComponents/AbilityComponent.h"
+#include "mega/MegaComponents/ActionComponent.h"
 #include "mega/MegaComponents/AttributeComponent.h"
 #include "mega/MegaComponents/CombatComponent.h"
 #include "mega/MegaComponents/MontagesComponent.h"
@@ -35,7 +35,7 @@ AMegaCharacter::AMegaCharacter() {
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	MontagesComponent = CreateDefaultSubobject<UMontagesComponent>(TEXT("MontagesComponent"));
 	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
-	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("AbilityComponent"));
+	ActionComponent = CreateDefaultSubobject<UActionComponent>(TEXT("ActionComponent"));
 }
 
 
@@ -94,7 +94,6 @@ void AMegaCharacter::PostInitializeComponents() {
 	if(CombatComponent) {
 		CombatComponent->MegaCharacter = this;
 		CombatComponent->MontagesComponent = MontagesComponent;
-		CombatComponent->AbilityComponent = AbilityComponent;
 		CombatComponent->InitializeCombatSystem();
 	}
 	if(MontagesComponent) {
@@ -105,10 +104,6 @@ void AMegaCharacter::PostInitializeComponents() {
 
 	if(AttributeComponent) {
 		AttributeComponent->OnHealthChanged.AddDynamic(this, &AMegaCharacter::OnHealthChanged);
-	}
-	if(AbilityComponent) {
-		AbilityComponent->MegaCharacter = this;
-		AbilityComponent->InitializeAbilitySystem();
 	}
 }
 
@@ -259,8 +254,8 @@ void AMegaCharacter::ChangePOVButtonPressed() {
 }
 
 void AMegaCharacter::QAbilityButtonPressed() {
-	if(CombatComponent) {
-		CombatComponent->MagicAbility();
+	if(ActionComponent) {
+		ActionComponent->StartActionByName(this, "MagicProjectile");
 	}
 }
 

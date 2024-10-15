@@ -8,6 +8,7 @@
 #include "mega/MegaComponents/CombatComponent.h"
 #include "MegaCharacter.generated.h"
 
+class UActionComponent;
 class UAbilityComponent;
 class UAttributeComponent;
 class UCameraComponent;
@@ -118,7 +119,7 @@ private:
 	UAttributeComponent* AttributeComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UAbilityComponent* AbilityComponent;
+	UActionComponent* ActionComponent;
 
 	UPROPERTY()
 	AWeapon* OverlappingWeapon;
