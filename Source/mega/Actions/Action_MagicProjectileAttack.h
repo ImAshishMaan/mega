@@ -17,7 +17,7 @@ protected:
 	FName HandSocketName;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> ProjectileClass;
+	TSoftClassPtr<AActor> ProjectileClass;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
@@ -34,6 +34,7 @@ protected:
 public:
 
 	virtual void StartAction_Implementation(AActor* Instigator) override;
+	void HandleProjectileSpawn(ACharacter* InstigatorCharacter);
 
 	UAction_MagicProjectileAttack();
 };

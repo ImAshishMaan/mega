@@ -3,6 +3,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "mega/AssetLoader/AssetLoaderUtility.h"
 
 UAction_MagicProjectileAttack::UAction_MagicProjectileAttack() {
 	HandSocketName = "MagicFireSocket";
@@ -14,6 +15,12 @@ void UAction_MagicProjectileAttack::StartAction_Implementation(AActor* Instigato
 
 	ACharacter* Character = Cast<ACharacter>(Instigator);
 	if(Character) {
+		// Start the async load of the projectile class at the start of the action
+		UAssetLoaderUtility::LoadAssetAsync(ProjectileClass, [this](UClass* LoadedProjectileClass) {
+			// Store the loaded class for use in HandleProjectileSpawn
+			this->ProjectileClass = LoadedProjectileClass;
+		});
+
 		Character->PlayAnimMontage(AttackAnim);
 		if(CastingEffect) {
 			UGameplayStatics::SpawnEmitterAttached(CastingEffect, Character->GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
@@ -27,6 +34,14 @@ void UAction_MagicProjectileAttack::StartAction_Implementation(AActor* Instigato
 
 
 void UAction_MagicProjectileAttack::AttackDelay_Elapsed(ACharacter* InstigatorCharacter) {
+	// Use AssetLoaderUtility to check if the asset is loaded and handle spawning
+	UAssetLoaderUtility::LoadAssetAsync(ProjectileClass, [this, InstigatorCharacter](UClass* LoadedProjectileClass) {
+		this->ProjectileClass = LoadedProjectileClass;
+		HandleProjectileSpawn(InstigatorCharacter);
+	});
+}
+
+void UAction_MagicProjectileAttack::HandleProjectileSpawn(ACharacter* InstigatorCharacter) {
 	if(ensure(ProjectileClass)) {
 		/*FVector HandLocation = InstigatorCharacter->GetMesh()->GetSocketLocation(HandSocketName);
 
@@ -113,8 +128,7 @@ void UAction_MagicProjectileAttack::AttackDelay_Elapsed(ACharacter* InstigatorCh
 
 				const FVector ToTarget = TraceHitResult.ImpactPoint - SocketTransform.GetLocation();
 				FRotator TargetRotation = ToTarget.Rotation();
-				checkf(ProjectileClass, TEXT("Projectile class not set."));
-				if(ProjectileClass && InstigatorCharacter) {
+				if(ProjectileClass.IsValid() && InstigatorCharacter) {
 					FActorSpawnParameters SpawnParams;
 					SpawnParams.Instigator = InstigatorCharacter;
 					SpawnParams.Owner = InstigatorCharacter;
@@ -122,7 +136,7 @@ void UAction_MagicProjectileAttack::AttackDelay_Elapsed(ACharacter* InstigatorCh
 					UWorld* World = GetWorld();
 					if(World) {
 						World->SpawnActor<AActor>(
-							ProjectileClass,
+							ProjectileClass.Get(),
 							SocketTransform.GetLocation(),
 							TargetRotation,
 							SpawnParams
@@ -131,7 +145,6 @@ void UAction_MagicProjectileAttack::AttackDelay_Elapsed(ACharacter* InstigatorCh
 				}
 			}
 		}
-
 		StopAction(InstigatorCharacter);
 	}
 }
