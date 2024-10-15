@@ -23,7 +23,7 @@ protected:
 	UAnimMontage* AttackAnim;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	UParticleSystem* CastingEffect;
+	TSoftObjectPtr<UParticleSystem> CastingEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
 	float AttackAnimDelay;
