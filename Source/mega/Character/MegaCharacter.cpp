@@ -219,8 +219,7 @@ void AMegaCharacter::ReloadButtonPressed() {
 
 void AMegaCharacter::PrimaryWeaponButtonPressed() {
 	if(CombatComponent) {
-		if(CombatComponent->PrimaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->
-		                                                                                         GetWeaponType() == CombatComponent->PrimaryWeapon->GetWeaponType()) {
+		if(CombatComponent->PrimaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->GetWeaponType() == CombatComponent->PrimaryWeapon->GetWeaponType()) {
 			CombatComponent->SetAnimLayer(EEquipped::UnEquipped);
 			CombatComponent->HolsterWeapon();
 		} else if(CombatComponent->PrimaryWeapon) {
@@ -232,8 +231,7 @@ void AMegaCharacter::PrimaryWeaponButtonPressed() {
 
 void AMegaCharacter::SecondaryWeaponButtonPressed() {
 	if(CombatComponent) {
-		if(CombatComponent->SecondaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->
-		                                                                                           GetWeaponType() == CombatComponent->SecondaryWeapon->GetWeaponType()) {
+		if(CombatComponent->SecondaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->GetWeaponType() == CombatComponent->SecondaryWeapon->GetWeaponType()) {
 			CombatComponent->SetAnimLayer(EEquipped::UnEquipped);
 			CombatComponent->HolsterWeapon();
 		} else if(CombatComponent->SecondaryWeapon) {
@@ -273,4 +271,3 @@ void AMegaCharacter::OnHealthChanged(AActor* InstigatorActor, UAttributeComponen
 		MegaPlayerController->SetHUDHealth(NewHealth, MaxHealth);
 	}
 }
-
