@@ -4,6 +4,14 @@
 #include "Enums.generated.h"
 
 UENUM(BlueprintType)
+enum class ECharacterForm : uint8 {
+	Human,
+	Traveler,
+
+	MaxDefault = 3
+};
+
+UENUM(BlueprintType)
 enum class EEquipped : uint8 {
 	UnEquipped = 0,
 	Rifle = 1,
