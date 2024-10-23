@@ -134,6 +134,7 @@ private:
 
 public:
 	FORCEINLINE void SetAimButtonPressed(bool bPressed) { bAimButtonPressed = bPressed; }
+	FORCEINLINE bool IsEquippingWeapon() { return EquippedWeapon == nullptr; }
 
 	
 };
