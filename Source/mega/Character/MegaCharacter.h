@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputSubsystems.h"
@@ -71,6 +73,9 @@ public:
 	UInputAction* QAbilityAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* TransformButtonAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	void AddMappingContext();
@@ -92,6 +97,7 @@ public:
 	void SecondaryWeaponButtonPressed();
 	void ChangePOVButtonPressed();
 	void QAbilityButtonPressed();
+	void TransformButtonPressed();
 
 protected:
 	virtual void BeginPlay() override;
@@ -105,6 +111,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* HumanMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCameraTP;
@@ -124,8 +133,25 @@ private:
 	UPROPERTY()
 	AWeapon* OverlappingWeapon;
 
+	/*
+	 * Characters Data
+	 */
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"), Category = "01 - Characters Meshes")
+	TMap<ECharacterForm, USkeletalMesh*> CharacterMeshesMap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"), Category = "01 - Characters Meshes")
+	TMap<ECharacterForm, UClass*> CharacterAnimsMap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"), Category = "01 - Characters Meshes")
+	TMap<ECharacterForm, UMaterialInterface*> CharacterMaterialMap;
+
+	ECharacterForm CurrentCharacterForm = ECharacterForm::Human;
+	
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
+	void ChangeForm(ECharacterForm NewCharacterForm);
+
 	bool IsWeaponEquipped();
 
 	FORCEINLINE AWeapon* GetEquippedWeapon() { return CombatComponent->EquippedWeapon; }

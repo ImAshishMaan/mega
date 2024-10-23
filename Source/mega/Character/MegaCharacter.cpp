@@ -16,6 +16,8 @@
 AMegaCharacter::AMegaCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
 
+	HumanMeshComponent = GetMesh();
+	
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComponent->SetupAttachment(GetRootComponent());
 	SpringArmComponent->TargetArmLength = 350.0f;
@@ -85,6 +87,8 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(SecondaryWeaponAction, ETriggerEvent::Triggered, this, &AMegaCharacter::SecondaryWeaponButtonPressed);
 		EnhancedInputComponent->BindAction(ChangePOVAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ChangePOVButtonPressed);
 		EnhancedInputComponent->BindAction(QAbilityAction, ETriggerEvent::Triggered, this, &AMegaCharacter::QAbilityButtonPressed);
+
+		EnhancedInputComponent->BindAction(TransformButtonAction, ETriggerEvent::Triggered, this, &AMegaCharacter::TransformButtonPressed);
 	}
 }
 
@@ -105,6 +109,8 @@ void AMegaCharacter::PostInitializeComponents() {
 	if(AttributeComponent) {
 		AttributeComponent->OnHealthChanged.AddDynamic(this, &AMegaCharacter::OnHealthChanged);
 	}
+
+	
 }
 
 void AMegaCharacter::Move(const FInputActionValue& Value) {
@@ -219,8 +225,7 @@ void AMegaCharacter::ReloadButtonPressed() {
 
 void AMegaCharacter::PrimaryWeaponButtonPressed() {
 	if(CombatComponent) {
-		if(CombatComponent->PrimaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->
-		                                                                                         GetWeaponType() == CombatComponent->PrimaryWeapon->GetWeaponType()) {
+		if(CombatComponent->PrimaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->GetWeaponType() == CombatComponent->PrimaryWeapon->GetWeaponType()) {
 			CombatComponent->SetAnimLayer(EEquipped::UnEquipped);
 			CombatComponent->HolsterWeapon();
 		} else if(CombatComponent->PrimaryWeapon) {
@@ -232,8 +237,7 @@ void AMegaCharacter::PrimaryWeaponButtonPressed() {
 
 void AMegaCharacter::SecondaryWeaponButtonPressed() {
 	if(CombatComponent) {
-		if(CombatComponent->SecondaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->
-		                                                                                           GetWeaponType() == CombatComponent->SecondaryWeapon->GetWeaponType()) {
+		if(CombatComponent->SecondaryWeapon && CombatComponent->EquippedWeapon && CombatComponent->EquippedWeapon->GetWeaponType() == CombatComponent->SecondaryWeapon->GetWeaponType()) {
 			CombatComponent->SetAnimLayer(EEquipped::UnEquipped);
 			CombatComponent->HolsterWeapon();
 		} else if(CombatComponent->SecondaryWeapon) {
@@ -259,6 +263,32 @@ void AMegaCharacter::QAbilityButtonPressed() {
 	}
 }
 
+void AMegaCharacter::TransformButtonPressed() {
+	if(CurrentCharacterForm == ECharacterForm::Human) {
+		ChangeForm(ECharacterForm::Traveler);
+	}else {
+		ChangeForm(ECharacterForm::Human);
+	}
+}
+
+void AMegaCharacter::ChangeForm(ECharacterForm NewCharacterForm) {
+	if(CharacterMeshesMap.Contains(NewCharacterForm)) {
+		CurrentCharacterForm = NewCharacterForm;
+		HumanMeshComponent->SetSkeletalMesh(CharacterMeshesMap[NewCharacterForm]);
+		HumanMeshComponent->SetAnimInstanceClass(CharacterAnimsMap[NewCharacterForm]);
+		HumanMeshComponent->SetMaterial(0, CharacterMaterialMap[NewCharacterForm]);
+
+		// TODO: Need to think about this later.
+		if(NewCharacterForm == ECharacterForm::Human) {
+			if(CombatComponent) {
+				CombatComponent->InitializeCombatSystem();
+			}
+		}
+	} else {
+		UE_LOG(LogTemp, Error, TEXT("CharacterForm %hhd does not exist"), NewCharacterForm);
+	}
+}
+
 bool AMegaCharacter::IsWeaponEquipped() {
 	return (CombatComponent && CombatComponent->EquippedWeapon);
 }
@@ -273,4 +303,3 @@ void AMegaCharacter::OnHealthChanged(AActor* InstigatorActor, UAttributeComponen
 		MegaPlayerController->SetHUDHealth(NewHealth, MaxHealth);
 	}
 }
-

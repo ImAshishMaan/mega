@@ -112,7 +112,11 @@ void UCombatComponent::UpdateCharacterStateWithSettings(ECharacterState NewState
 
 
 void UCombatComponent::SetAnimLayer(EEquipped CurrentEquipped) {
-	if(CurrentEquipped != LastEquipped) {
+	/*
+	 * 	Why I did CurrentEquipped != LastEquipped  ??
+	 * 	current true so Character transform work perfectly
+	 */
+	if(/*CurrentEquipped != LastEquipped*/true ) {
 		TMap<EEquipped, TSubclassOf<UAnimInstance>>::ValueType instance = AnimInstanceMap[CurrentEquipped];
 		MegaCharacter->GetMesh()->LinkAnimClassLayers(instance);
 		LastEquipped = CurrentEquipped;
