@@ -5,7 +5,6 @@ void UPauseUIManager::ShowWidget(TSubclassOf<UUserWidget> WidgetClass, APlayerCo
 	if(WidgetClass && PlayerController) {
 		for (UUserWidget* Widget : WidgetStack) {
 			if (Widget->GetClass() == WidgetClass) {
-				// Bring this widget to the front if already exists
 				Widget->AddToViewport();
 				return;
 			}

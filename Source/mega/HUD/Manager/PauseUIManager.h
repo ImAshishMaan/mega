@@ -20,4 +20,6 @@ private:
 
 	// Stack to keep track of the widgets
 	TArray<UUserWidget*> WidgetStack;
+
+	//TODO: Use Widget Cache so we don't instantiate the same widget multiple times
 };
