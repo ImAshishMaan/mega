@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "Manager/PauseUIManager.h"
 #include "mega/Enums.h"
 #include "MegaHUD.generated.h"
 
@@ -16,6 +17,12 @@ public:
 	virtual void DrawHUD() override;
 
 	void InitOverlays();
+
+	/*
+	 * UI manager reference
+	 */
+	UPROPERTY()
+	UPauseUIManager* PauseUIManager;
 
 	UPROPERTY(EditAnywhere, Category = "Overlays")
 	TSubclassOf<UUserWidget> CharacterOverlayClass;

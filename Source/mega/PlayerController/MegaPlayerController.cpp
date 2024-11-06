@@ -1,13 +1,50 @@
 #include "MegaPlayerController.h"
+#include "EnhancedInputComponent.h"
 #include "Components/ProgressBar.h"
+#include "mega/Anim/MegaAnimInstance.h"
 #include "mega/HUD/CharacterOverlayWidget.h"
 #include "mega/HUD/MegaHUD.h"
+
+AMegaPlayerController::AMegaPlayerController() {
+	/*static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputContextObj(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Inputs/IMC_Mega.IMC_Mega'"));
+	if(InputContextObj.Succeeded()) {
+		DefaultMappingContext = InputContextObj.Object;
+	}*/
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputContextObj(TEXT("InputMappingContext'/Game/Inputs/IMC_Mega.IMC_Mega'"));
+	if(InputContextObj.Succeeded()) {
+		DefaultMappingContext = InputContextObj.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionObj(TEXT("InputAction'/Game/Inputs/Actions/IA_Pause.IA_Pause'"));
+	if(InputActionObj.Succeeded()) {
+		TogglePauseAction = InputActionObj.Object;
+	}
+}
+
 
 void AMegaPlayerController::BeginPlay() {
 	Super::BeginPlay();
 
 	MegaHUD = Cast<AMegaHUD>(GetHUD());
-	
+}
+
+
+void AMegaPlayerController::SetupInputComponent() {
+	Super::SetupInputComponent();
+
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	if(Subsystem && DefaultMappingContext) {
+		Subsystem->AddMappingContext(DefaultMappingContext, 0);
+	}
+
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
+	if(EnhancedInputComponent) {
+		EnhancedInputComponent->BindAction(TogglePauseAction, ETriggerEvent::Triggered, this, &AMegaPlayerController::TogglePausePressed);
+	}
+}
+
+void AMegaPlayerController::TogglePausePressed() {
+	UE_LOG(LogTemp, Warning, TEXT("TogglePausePressed"));
 }
 
 void AMegaPlayerController::SetHUDHealth(float Health, float MaxHealth) {
@@ -19,4 +56,3 @@ void AMegaPlayerController::SetHUDHealth(float Health, float MaxHealth) {
 		MegaHUD->CharacterOverlay->HealthBar->SetPercent(HealthPercent);
 	}
 }
-

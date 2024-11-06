@@ -5,6 +5,10 @@
 
 void AMegaHUD::BeginPlay() {
 	Super::BeginPlay();
+	
+	if(PauseUIManager == nullptr) {
+		PauseUIManager = NewObject<UPauseUIManager>(this, UPauseUIManager::StaticClass());
+	}
 
 	InitOverlays();
 	AddCharacterOverlay();
