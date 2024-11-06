@@ -3,6 +3,14 @@
 
 void UPauseUIManager::ShowWidget(TSubclassOf<UUserWidget> WidgetClass, APlayerController* PlayerController) {
 	if(WidgetClass && PlayerController) {
+		for (UUserWidget* Widget : WidgetStack) {
+			if (Widget->GetClass() == WidgetClass) {
+				// Bring this widget to the front if already exists
+				Widget->AddToViewport();
+				return;
+			}
+		}
+		
 		UUserWidget* NewWidget = CreateWidget<UUserWidget>(PlayerController, WidgetClass);
 		if(NewWidget) {
 			if(WidgetStack.Num() > 0) {

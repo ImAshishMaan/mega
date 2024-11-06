@@ -6,10 +6,6 @@
 #include "mega/HUD/MegaHUD.h"
 
 AMegaPlayerController::AMegaPlayerController() {
-	/*static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputContextObj(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Inputs/IMC_Mega.IMC_Mega'"));
-	if(InputContextObj.Succeeded()) {
-		DefaultMappingContext = InputContextObj.Object;
-	}*/
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputContextObj(TEXT("InputMappingContext'/Game/Inputs/IMC_Mega.IMC_Mega'"));
 	if(InputContextObj.Succeeded()) {
 		DefaultMappingContext = InputContextObj.Object;
@@ -45,6 +41,10 @@ void AMegaPlayerController::SetupInputComponent() {
 
 void AMegaPlayerController::TogglePausePressed() {
 	UE_LOG(LogTemp, Warning, TEXT("TogglePausePressed"));
+	MegaHUD = MegaHUD == nullptr ? Cast<AMegaHUD>(GetHUD()) : MegaHUD;
+	if(MegaHUD) {
+		MegaHUD->PauseUIManager->ShowWidget(MegaHUD->PauseMenuClass, this);
+	}
 }
 
 void AMegaPlayerController::SetHUDHealth(float Health, float MaxHealth) {
