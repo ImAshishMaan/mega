@@ -2,11 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "Manager/PauseUIManager.h"
 #include "mega/Enums.h"
 #include "MegaHUD.generated.h"
 
 class UCharacterOverlayWidget;
 class UTexture2D;
+class UUserWidget;
 
 UCLASS()
 class MEGA_API AMegaHUD : public AHUD {
@@ -17,11 +19,27 @@ public:
 
 	void InitOverlays();
 
+	/*
+	 * UI manager reference
+	 */
+	UPROPERTY()
+	UPauseUIManager* PauseUIManager;
+
 	UPROPERTY(EditAnywhere, Category = "Overlays")
 	TSubclassOf<UUserWidget> CharacterOverlayClass;
 
 	UPROPERTY()
 	UCharacterOverlayWidget* CharacterOverlay;
+
+	/*
+	 * UI setttings
+	 */
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> PauseMenuClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> SettingMenuClass;
 
 	/*
 	 * Add Overlays to Viewport

@@ -22,7 +22,7 @@ void UMontagesComponent::PlayFireMontage() {
 }
 
 void UMontagesComponent::PlayReloadMontage() {
-	if(MegaCharacter == nullptr || CombatComponent->CombatState == ECombatState::ECS_Reloading) return;
+	if(MegaCharacter == nullptr || CombatComponent->CombatState == ECombatState::ECS_Reloading || CombatComponent->IsEquippingWeapon()) return;
 
 	UAnimInstance* AnimInstance = MegaCharacter->GetMesh()->GetAnimInstance();
 	if(AnimInstance && ReloadMontage) {
@@ -32,6 +32,7 @@ void UMontagesComponent::PlayReloadMontage() {
 		OnMontageEnded.BindUFunction(this, "OnFireMontageEnded");
 		AnimInstance->Montage_SetEndDelegate(OnMontageEnded, FireMontage);
 		AnimInstance->Montage_Play(ReloadMontage);
+		CombatComponent->CombatState = ECombatState::ECS_Unoccupied; // need to remove this when it's done
 	}
 }
 
