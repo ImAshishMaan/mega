@@ -38,5 +38,5 @@ void AAI_AnimalController::UpdateHunger(bool IsHungry) {
 }
 
 void AAI_AnimalController::UpdateEating(bool IsEating) {
-	//GetBlackboardComponent()->SetValueAsBool("IsEating", IsEating);
+	GetBlackboardComponent()->SetValueAsBool("IsEating", IsEating);
 }
