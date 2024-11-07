@@ -19,9 +19,11 @@ public:
 	AMegaPlayerController();
 	void SetHUDHealth(float Health, float MaxHealth);
 	virtual void SetupInputComponent() override;
+	void EnableMouse(bool bEnable);
 
 	UPROPERTY()
 	UInputMappingContext* DefaultMappingContext;
+	
 	UPROPERTY()
 	UInputAction* TogglePauseAction;
 	void TogglePausePressed();

@@ -1,15 +1,16 @@
 #include "PauseUIManager.h"
 #include "Blueprint/UserWidget.h"
+#include "mega/PlayerController/MegaPlayerController.h"
 
 void UPauseUIManager::ShowWidget(TSubclassOf<UUserWidget> WidgetClass, APlayerController* PlayerController) {
 	if(WidgetClass && PlayerController) {
-		for (UUserWidget* Widget : WidgetStack) {
-			if (Widget->GetClass() == WidgetClass) {
+		for(UUserWidget* Widget: WidgetStack) {
+			if(Widget->GetClass() == WidgetClass) {
 				Widget->AddToViewport();
 				return;
 			}
 		}
-		
+
 		UUserWidget* NewWidget = CreateWidget<UUserWidget>(PlayerController, WidgetClass);
 		if(NewWidget) {
 			if(WidgetStack.Num() > 0) {
@@ -31,6 +32,11 @@ void UPauseUIManager::PopWidget(APlayerController* PlayerController) {
 
 		if(WidgetStack.Num() > 0) {
 			WidgetStack.Last()->AddToViewport();
+		} else {
+			AMegaPlayerController* MegaPlayerController = Cast<AMegaPlayerController>(PlayerController);
+			if(MegaPlayerController) {
+				MegaPlayerController->EnableMouse(false);
+			}
 		}
 	}
 }

@@ -39,11 +39,27 @@ void AMegaPlayerController::SetupInputComponent() {
 	}
 }
 
+void AMegaPlayerController::EnableMouse(bool bEnable) {
+	bShowMouseCursor = bEnable;
+	bEnableClickEvents = bEnable;
+	bEnableMouseOverEvents = bEnable;
+	// Set the input mode to UI only so that mouse can interact with widgets
+	if(bEnable) {
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		SetInputMode(InputMode);
+	} else {
+		FInputModeGameOnly InputMode;
+		SetInputMode(InputMode);
+	}
+}
+
 void AMegaPlayerController::TogglePausePressed() {
 	UE_LOG(LogTemp, Warning, TEXT("TogglePausePressed"));
 	MegaHUD = MegaHUD == nullptr ? Cast<AMegaHUD>(GetHUD()) : MegaHUD;
 	if(MegaHUD) {
 		MegaHUD->PauseUIManager->ShowWidget(MegaHUD->PauseMenuClass, this);
+		EnableMouse(true);
 	}
 }
 
