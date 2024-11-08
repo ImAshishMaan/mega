@@ -130,6 +130,9 @@ protected:
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UAttributeComponent* OwningComp, float NewHealth, float MaxHealth, float Damage);
 
+	UPROPERTY()
+	AMegaHUD* MegaHUD;
+	
 	UPROPERTY(VisibleAnywhere, Category = "Character | Interactable")
 	TScriptInterface<IInteractionInterface> TargetInteractable;
 

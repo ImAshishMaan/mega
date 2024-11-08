@@ -12,6 +12,8 @@ AInterfaceTestActor::AInterfaceTestActor() {
 
 void AInterfaceTestActor::BeginPlay() {
 	Super::BeginPlay();
+
+	InteractableData = InstanceInteractableData;
 }
 
 void AInterfaceTestActor::Tick(float DeltaTime) {

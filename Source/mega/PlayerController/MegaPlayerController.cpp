@@ -4,6 +4,7 @@
 #include "mega/Anim/MegaAnimInstance.h"
 #include "mega/HUD/CharacterOverlayWidget.h"
 #include "mega/HUD/MegaHUD.h"
+#include "UObject/ConstructorHelpers.h"
 
 AMegaPlayerController::AMegaPlayerController() {
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputContextObj(TEXT("InputMappingContext'/Game/Inputs/IMC_Mega.IMC_Mega'"));

@@ -18,6 +18,7 @@
 #include "mega/PlayerController/MegaPlayerController.h"
 #include "mega/Weapon/Weapon.h"
 #include "DrawDebugHelpers.h"
+#include "mega/HUD/MegaHUD.h"
 
 AMegaCharacter::AMegaCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -50,6 +51,8 @@ AMegaCharacter::AMegaCharacter() {
 void AMegaCharacter::BeginPlay() {
 	Super::BeginPlay();
 	AddMappingContext();
+
+	MegaHUD = Cast<AMegaHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 }
 
 void AMegaCharacter::SetOverlappingWeapon(AWeapon* Weapon) {
@@ -383,6 +386,8 @@ void AMegaCharacter::FoundInteractable(AActor* NewInteractable) {
 	InteractionData.CurrentInteractable = NewInteractable;
 	TargetInteractable = NewInteractable;
 
+	MegaHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+
 	TargetInteractable->BeginFocus();
 }
 
@@ -396,7 +401,7 @@ void AMegaCharacter::NoInteractableFound() {
 			TargetInteractable->EndFocus();
 		}
 
-		// Hide the interaction widget on the HUD
+		MegaHUD->HideInteractionWidget();
 
 		InteractionData.CurrentInteractable = nullptr;
 		TargetInteractable = nullptr;

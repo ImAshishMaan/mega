@@ -18,6 +18,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Test Actor")
 	UStaticMeshComponent* Mesh;
 
+	UPROPERTY(EditInstanceOnly, Category = "Test Actor")
+	FInteractableData InstanceInteractableData;
+
 public:
 	virtual void Tick(float DeltaTime) override;
 	
