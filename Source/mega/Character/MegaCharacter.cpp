@@ -4,20 +4,26 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
 #include "Engine/LocalPlayer.h"
+#include "Engine/World.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "mega/Interfaces/InteractionInterface.h"
 #include "mega/MegaComponents/ActionComponent.h"
 #include "mega/MegaComponents/AttributeComponent.h"
 #include "mega/MegaComponents/CombatComponent.h"
 #include "mega/MegaComponents/MontagesComponent.h"
 #include "mega/PlayerController/MegaPlayerController.h"
 #include "mega/Weapon/Weapon.h"
+#include "DrawDebugHelpers.h"
 
 AMegaCharacter::AMegaCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
 
 	HumanMeshComponent = GetMesh();
-	
+
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComponent->SetupAttachment(GetRootComponent());
 	SpringArmComponent->TargetArmLength = 350.0f;
@@ -52,11 +58,6 @@ void AMegaCharacter::SetOverlappingWeapon(AWeapon* Weapon) {
 	}
 }
 
-
-void AMegaCharacter::Tick(float DeltaTime) {
-	Super::Tick(DeltaTime);
-}
-
 void AMegaCharacter::AddMappingContext() {
 	if(APlayerController* PlayerController = Cast<APlayerController>(GetController())) {
 		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
@@ -87,6 +88,8 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(SecondaryWeaponAction, ETriggerEvent::Triggered, this, &AMegaCharacter::SecondaryWeaponButtonPressed);
 		EnhancedInputComponent->BindAction(ChangePOVAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ChangePOVButtonPressed);
 		EnhancedInputComponent->BindAction(QAbilityAction, ETriggerEvent::Triggered, this, &AMegaCharacter::QAbilityButtonPressed);
+		EnhancedInputComponent->BindAction(InteractionButtonAction, ETriggerEvent::Triggered, this, &AMegaCharacter::InteractionButtonPressed);
+		EnhancedInputComponent->BindAction(InteractionButtonAction, ETriggerEvent::Completed, this, &AMegaCharacter::InteractionButtonReleased);
 
 		EnhancedInputComponent->BindAction(TransformButtonAction, ETriggerEvent::Triggered, this, &AMegaCharacter::TransformButtonPressed);
 	}
@@ -109,8 +112,6 @@ void AMegaCharacter::PostInitializeComponents() {
 	if(AttributeComponent) {
 		AttributeComponent->OnHealthChanged.AddDynamic(this, &AMegaCharacter::OnHealthChanged);
 	}
-
-	
 }
 
 void AMegaCharacter::Move(const FInputActionValue& Value) {
@@ -266,9 +267,17 @@ void AMegaCharacter::QAbilityButtonPressed() {
 void AMegaCharacter::TransformButtonPressed() {
 	if(CurrentCharacterForm == ECharacterForm::Human) {
 		ChangeForm(ECharacterForm::Traveler);
-	}else {
+	} else {
 		ChangeForm(ECharacterForm::Human);
 	}
+}
+
+void AMegaCharacter::InteractionButtonPressed() {
+	BeginInteract();
+}
+
+void AMegaCharacter::InteractionButtonReleased() {
+	EndInteract();
 }
 
 void AMegaCharacter::ChangeForm(ECharacterForm NewCharacterForm) {
@@ -301,5 +310,135 @@ void AMegaCharacter::OnHealthChanged(AActor* InstigatorActor, UAttributeComponen
 	AMegaPlayerController* MegaPlayerController = Cast<AMegaPlayerController>(GetController());
 	if(MegaPlayerController) {
 		MegaPlayerController->SetHUDHealth(NewHealth, MaxHealth);
+	}
+}
+
+void AMegaCharacter::Tick(float DeltaTime) {
+	Super::Tick(DeltaTime);
+
+	if(GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) >= InteractionCheckFrequency) {
+		PerformInteractionCheck();
+	}
+}
+
+void AMegaCharacter::PerformInteractionCheck() {
+	InteractionData.LastInteractionCheckTime = GetWorld()->GetTimeSeconds();
+
+	FVector2D ViewportSize;
+	if(GEngine && GEngine->GameViewport) {
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+
+	// Get the crosshair location in the middle of the screen
+	FVector2D CrosshairLocation(ViewportSize.X / 2.0f, ViewportSize.Y / 2.0f);
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
+
+	// Deproject the crosshair screen location to world space
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrosshairLocation,
+		CrosshairWorldPosition,
+		CrosshairWorldDirection
+	);
+	if(bScreenToWorld) {
+		FVector Start = CrosshairWorldPosition;
+
+		FVector End = Start + CrosshairWorldDirection * InteractionCheckDistance;
+
+		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.5f, 0, 0.5f);
+
+		FCollisionQueryParams TracerParams;
+		TracerParams.AddIgnoredActor(this);
+
+		FHitResult TraceHitResult;
+
+		if(GetWorld()->LineTraceSingleByChannel(TraceHitResult, Start, End, ECollisionChannel::ECC_Visibility, TracerParams)) {
+			if(TraceHitResult.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass())) {
+				const float Distance = (Start - TraceHitResult.ImpactPoint).Size();
+
+				if(TraceHitResult.GetActor() != InteractionData.CurrentInteractable && Distance <= InteractionCheckDistance) {
+					FoundInteractable(TraceHitResult.GetActor());
+					return;
+				}
+
+				if(TraceHitResult.GetActor() == InteractionData.CurrentInteractable) {
+					return;
+				}
+			}
+		}
+
+		NoInteractableFound();
+	}
+}
+
+void AMegaCharacter::FoundInteractable(AActor* NewInteractable) {
+	if(IsInteracting()) {
+		EndInteract();
+	}
+
+	if(InteractionData.CurrentInteractable) {
+		TargetInteractable = InteractionData.CurrentInteractable;
+		TargetInteractable->EndFocus();
+	}
+
+	InteractionData.CurrentInteractable = NewInteractable;
+	TargetInteractable = NewInteractable;
+
+	TargetInteractable->BeginFocus();
+}
+
+void AMegaCharacter::NoInteractableFound() {
+	if(IsInteracting()) {
+		GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+	}
+
+	if(InteractionData.CurrentInteractable) {
+		if(IsValid(TargetInteractable.GetObject())) {
+			TargetInteractable->EndFocus();
+		}
+
+		// Hide the interaction widget on the HUD
+
+		InteractionData.CurrentInteractable = nullptr;
+		TargetInteractable = nullptr;
+	}
+}
+
+void AMegaCharacter::BeginInteract() {
+	// Verify that nothing has changed with the interactable state since beginning interaction
+	PerformInteractionCheck();
+
+	if(InteractionData.CurrentInteractable) {
+		if(IsValid(TargetInteractable.GetObject())) {
+			TargetInteractable->BeginInteract();
+
+			if(FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f)) {
+				Interact();
+			} else {
+				GetWorldTimerManager().SetTimer(
+					TimerHandle_Interaction,
+					this,
+					&AMegaCharacter::Interact,
+					TargetInteractable->InteractableData.InteractionDuration,
+					false
+				);
+			}
+		}
+	}
+}
+
+void AMegaCharacter::EndInteract() {
+	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+
+	if(IsValid(TargetInteractable.GetObject())) {
+		TargetInteractable->EndInteract();
+	}
+	
+}
+void AMegaCharacter::Interact() {
+	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+	if(IsValid(TargetInteractable.GetObject())) {
+		TargetInteractable->Interact();
 	}
 }
