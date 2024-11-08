@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "mega/Character/MegaCharacter.h"
 #include "UObject/Interface.h"
 #include "InteractionInterface.generated.h"
 
@@ -60,10 +61,9 @@ public:
 
 	virtual void BeginFocus();
 	virtual void EndFocus();
-
 	virtual void BeginInteract();
 	virtual void EndInteract();
-	virtual void Interact();
+	virtual void Interact(AMegaCharacter* PlayerCharacter);
 
 	FInteractableData InteractableData;
 	

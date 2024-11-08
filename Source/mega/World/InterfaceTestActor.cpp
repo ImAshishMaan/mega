@@ -38,6 +38,6 @@ void AInterfaceTestActor::EndInteract() {
 	UE_LOG(LogTemp, Warning, TEXT("EndInteract"));
 }
 
-void AInterfaceTestActor::Interact() {
+void AInterfaceTestActor::Interact(AMegaCharacter* PlayerCharacter) {
 	UE_LOG(LogTemp, Warning, TEXT("Interact"));
 }

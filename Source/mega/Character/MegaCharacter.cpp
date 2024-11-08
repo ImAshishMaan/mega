@@ -355,9 +355,7 @@ void AMegaCharacter::PerformInteractionCheck() {
 
 		if(GetWorld()->LineTraceSingleByChannel(TraceHitResult, Start, End, ECollisionChannel::ECC_Visibility, TracerParams)) {
 			if(TraceHitResult.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass())) {
-				const float Distance = (Start - TraceHitResult.ImpactPoint).Size();
-
-				if(TraceHitResult.GetActor() != InteractionData.CurrentInteractable && Distance <= InteractionCheckDistance) {
+				if(TraceHitResult.GetActor() != InteractionData.CurrentInteractable) {
 					FoundInteractable(TraceHitResult.GetActor());
 					return;
 				}
@@ -439,6 +437,6 @@ void AMegaCharacter::EndInteract() {
 void AMegaCharacter::Interact() {
 	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
 	if(IsValid(TargetInteractable.GetObject())) {
-		TargetInteractable->Interact();
+		TargetInteractable->Interact(this);
 	}
 }
