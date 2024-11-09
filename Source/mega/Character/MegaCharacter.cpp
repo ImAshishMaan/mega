@@ -19,6 +19,7 @@
 #include "mega/Weapon/Weapon.h"
 #include "DrawDebugHelpers.h"
 #include "mega/HUD/MegaHUD.h"
+#include "mega/MegaComponents/InventoryComponent.h"
 
 AMegaCharacter::AMegaCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -45,6 +46,11 @@ AMegaCharacter::AMegaCharacter() {
 	MontagesComponent = CreateDefaultSubobject<UMontagesComponent>(TEXT("MontagesComponent"));
 	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
 	ActionComponent = CreateDefaultSubobject<UActionComponent>(TEXT("ActionComponent"));
+	
+	PlayerInventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+	PlayerInventoryComponent->SetSlotsCapacity(20);
+	PlayerInventoryComponent->SetWeightCapacity(50.0f);
+	
 }
 
 
@@ -349,7 +355,7 @@ void AMegaCharacter::PerformInteractionCheck() {
 
 		FVector End = Start + CrosshairWorldDirection * InteractionCheckDistance;
 
-		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.5f, 0, 0.5f);
+		//DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.5f, 0, 0.5f);
 
 		FCollisionQueryParams TracerParams;
 		TracerParams.AddIgnoredActor(this);
@@ -445,3 +451,10 @@ void AMegaCharacter::Interact() {
 		TargetInteractable->Interact(this);
 	}
 }
+
+void AMegaCharacter::UpdateInteractionWidget() const {
+	if(IsValid(TargetInteractable.GetObject())) {
+		MegaHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+	}
+}
+

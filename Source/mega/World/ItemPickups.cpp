@@ -1,8 +1,8 @@
 #include "ItemPickups.h"
-
 #include "Components/StaticMeshComponent.h"
 #include "Engine/SkeletalMesh.h"
 #include "mega/Items/ItemBase.h"
+#include "mega/MegaComponents/InventoryComponent.h"
 
 AItemPickups::AItemPickups() {
 	PrimaryActorTick.bCanEverTick = false;
@@ -37,7 +37,6 @@ void AItemPickups::InitializePickup(const TSubclassOf<UItemBase> BaseClass, cons
 		PickupMesh->SetStaticMesh(ItemData->ItemAssetData.Mesh);
 
 		UpdateInteractableData();
-		
 	}
 }
 
@@ -46,9 +45,8 @@ void AItemPickups::InitializeDrop(UItemBase* ItemToDrop, const int32 InQuantity)
 	InQuantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(InQuantity);
 	ItemReference->ItemNumericData.Weight = ItemToDrop->GetItemSingleWeight();
 	PickupMesh->SetStaticMesh(ItemToDrop->ItemAssetData.Mesh);
-	
+
 	UpdateInteractableData();
-	
 }
 
 void AItemPickups::UpdateInteractableData() {
@@ -83,13 +81,26 @@ void AItemPickups::Interact(AMegaCharacter* PlayerCharacter) {
 void AItemPickups::TakePickup(const AMegaCharacter* Taker) {
 	if(!IsPendingKillPending()) {
 		if(ItemReference) {
-			/*if(UInventoryComponenet* PlayerInventory = Taker->GetInventory()) {
-				
-			}*/
+			if(UInventoryComponent* PlayerInventory = Taker->GetInventory()) {
+				const FItemAddResult AddResult = PlayerInventory->HandleAddItem(ItemReference);
 
-			// try to add item to player inventory
-			// based on result of that we add operation
-			// adjust or destroy item
+				switch(AddResult.OperationResult) {
+				case EItemAddResult::IAR_NoItemAdded:
+					break;
+				case EItemAddResult::IAR_PartialAmountItemAdded:
+					UpdateInteractableData();
+					Taker->UpdateInteractionWidget();
+					break;
+				case EItemAddResult::IAR_AllItemAdded:
+					Destroy();
+					break;
+				}
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *AddResult.ResultMessage.ToString());
+			} else {
+				UE_LOG(LogTemp, Warning, TEXT("Player does not have an inventory component!"));
+			}
+		} else {
+			UE_LOG(LogTemp, Warning, TEXT("Pickup internal item reference is null!"));
 		}
 	}
 }
@@ -108,6 +119,3 @@ void AItemPickups::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 		}
 	}
 }
-
-
-

@@ -5,9 +5,8 @@
 #include "mega/Data/ItemDataStructs.h"
 #include "ItemBase.generated.h"
 
-/**
- * 
- */
+class UInventoryComponent;
+
 UCLASS()
 class MEGA_API UItemBase : public UObject {
 	GENERATED_BODY()
@@ -15,8 +14,8 @@ public:
 	//===============================================================================
 	// Properties & Variables
 	//===============================================================================
-	/*UPROPERTY()
-	UInventoryComponent* OwningInventory;*/
+	UPROPERTY()
+	UInventoryComponent* OwningInventory;
 
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	int32 Quantity;
@@ -42,10 +41,15 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	FItemAssetData ItemAssetData;
 
+	bool bIsCopy;
+	bool bIsPickup;
+
 	//===============================================================================
 	// Functions
 	//===============================================================================
 	UItemBase();
+
+	void ResetItemFlags();
 
 	UFUNCTION(Category = "Item")
 	UItemBase* CreateItemCopy() const;

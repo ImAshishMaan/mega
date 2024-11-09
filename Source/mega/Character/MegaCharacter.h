@@ -10,6 +10,8 @@
 #include "mega/MegaComponents/CombatComponent.h"
 #include "MegaCharacter.generated.h"
 
+class UInventoryComponent;
+
 USTRUCT()
 struct FInteractionData {
 	GENERATED_USTRUCT_BODY()
@@ -123,6 +125,9 @@ public:
 
 
 	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); }
+	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventoryComponent; }
+
+	void UpdateInteractionWidget() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -177,6 +182,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UActionComponent* ActionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UInventoryComponent* PlayerInventoryComponent;
 
 	UPROPERTY()
 	AWeapon* OverlappingWeapon;
