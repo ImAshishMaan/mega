@@ -56,6 +56,23 @@ void AMegaHUD::HideMenu() {
 		MainMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
+
+void AMegaHUD::ToggleMenu() {
+	if(bIsMenuVisible) {
+		HideMenu();
+
+		const FInputModeGameOnly InputModeGameOnly;
+		GetOwningPlayerController()->SetInputMode(InputModeGameOnly);
+		GetOwningPlayerController()->SetShowMouseCursor(false);
+	} else {
+		DisplayMenu();
+
+		const FInputModeGameAndUI InputModeGameOnly;
+		GetOwningPlayerController()->SetInputMode(InputModeGameOnly);
+		GetOwningPlayerController()->SetShowMouseCursor(true);
+	}
+}
+
 void AMegaHUD::ShowInteractionWidget() {
 	if(InteractionWidget) {
 		InteractionWidget->SetVisibility(ESlateVisibility::Visible);

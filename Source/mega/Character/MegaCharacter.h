@@ -98,6 +98,9 @@ public:
 	UInputAction* InteractionButtonAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ToggleInventoryMenuAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	void AddMappingContext();
@@ -122,6 +125,7 @@ public:
 	void TransformButtonPressed();
 	void InteractionButtonPressed();
 	void InteractionButtonReleased();
+	void ToggleInventoryMenuPressed(); // TODO: may be move it to controller class !!
 
 
 	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); }

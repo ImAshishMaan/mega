@@ -99,6 +99,7 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(QAbilityAction, ETriggerEvent::Triggered, this, &AMegaCharacter::QAbilityButtonPressed);
 		EnhancedInputComponent->BindAction(InteractionButtonAction, ETriggerEvent::Triggered, this, &AMegaCharacter::InteractionButtonPressed);
 		EnhancedInputComponent->BindAction(InteractionButtonAction, ETriggerEvent::Completed, this, &AMegaCharacter::InteractionButtonReleased);
+		EnhancedInputComponent->BindAction(ToggleInventoryMenuAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ToggleInventoryMenuPressed);
 
 		EnhancedInputComponent->BindAction(TransformButtonAction, ETriggerEvent::Triggered, this, &AMegaCharacter::TransformButtonPressed);
 	}
@@ -287,6 +288,10 @@ void AMegaCharacter::InteractionButtonPressed() {
 
 void AMegaCharacter::InteractionButtonReleased() {
 	EndInteract();
+}
+
+void AMegaCharacter::ToggleInventoryMenuPressed() {
+	MegaHUD->ToggleMenu();
 }
 
 void AMegaCharacter::ChangeForm(ECharacterForm NewCharacterForm) {
