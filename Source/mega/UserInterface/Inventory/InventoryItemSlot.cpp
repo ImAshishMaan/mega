@@ -32,7 +32,7 @@ void UInventoryItemSlot::NativeConstruct() {
 			ItemBorder->SetBrushColor(FLinearColor::Blue);
 			break;
 		case EItemQuality::Grandmaster:
-			ItemBorder->SetBrushColor(FLinearColor(100.0f, 65.0f, 0.0f, 1.0f)); // orange
+			ItemBorder->SetBrushColor(FLinearColor(1.0f, 0.45f, 0.0f)); // orange
 			break;
 			default: ;
 		}
