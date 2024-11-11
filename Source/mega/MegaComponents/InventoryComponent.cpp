@@ -127,11 +127,11 @@ FItemAddResult UInventoryComponent::HandleAddItem(UItemBase* InputItem) {
 
 void UInventoryComponent::AddNewItem(UItemBase* Item, const int32 AmountToAdd) {
 	UItemBase* NewItem;
-	if(Item->bIsCopy || Item->bIsPickup) {
+	if(Item->bIsCopy || Item->bIsPickup || true) { // TODO: FIX:: Data is getting lost here if we go to else state
 		// if item is already a copy, or is a world pickup
 		NewItem = Item;
 		NewItem->ResetItemFlags();
-	}else {
+	} else {
 		// used when splitting or dragging to/from inventory
 		NewItem = Item->CreateItemCopy();
 	}

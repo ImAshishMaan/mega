@@ -1,5 +1,7 @@
 #include "InventoryItemSlot.h"
+#include "DragItemVisual.h"
 #include "InventoryTooltip.h"
+#include "ItemDragDropOperation.h"
 #include "Components/Border.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -48,7 +50,15 @@ void UInventoryItemSlot::NativeConstruct() {
 }
 
 FReply UInventoryItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) {
-	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+
+	if(InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton) {
+		return Reply.Handled().DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
+	}
+
+	// Sub menu on right click will happen here
+
+	return Reply.Unhandled();
 }
 
 void UInventoryItemSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent) {
@@ -57,6 +67,23 @@ void UInventoryItemSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent) {
 
 void UInventoryItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+
+	if(DragVisualClass) {
+		UDragItemVisual* DragVisual = CreateWidget<UDragItemVisual>(this, DragVisualClass);
+		DragVisual->ItemIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
+		DragVisual->ItemBorder->SetBrushColor(ItemBorder->GetBrushColor());
+		DragVisual->ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity));
+
+		UItemDragDropOperation* DragItemOperation = NewObject<UItemDragDropOperation>(this, UItemDragDropOperation::StaticClass());
+		DragItemOperation->SourceItem = ItemReference;
+		DragItemOperation->SourceInventory = ItemReference->OwningInventory;
+
+		DragItemOperation->DefaultDragVisual = DragVisual;
+		DragItemOperation->Pivot = EDragPivot::TopLeft;
+
+		OutOperation = DragItemOperation;
+		
+	}
 }
 
 bool UInventoryItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) {

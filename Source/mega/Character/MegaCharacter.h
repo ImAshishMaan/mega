@@ -10,6 +10,7 @@
 #include "mega/MegaComponents/CombatComponent.h"
 #include "MegaCharacter.generated.h"
 
+class UItemBase;
 class UInventoryComponent;
 
 USTRUCT()
@@ -132,6 +133,8 @@ public:
 	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventoryComponent; }
 
 	void UpdateInteractionWidget() const;
+
+	void DropItem(UItemBase* ItemToDrop, const int32 QuantityToDrop);
 
 protected:
 	virtual void BeginPlay() override;

@@ -1,7 +1,7 @@
 #include "ItemBase.h"
 #include "mega/MegaComponents/InventoryComponent.h"
 
-UItemBase::UItemBase() : bIsCopy(false), bIsPickup(true) {
+UItemBase::UItemBase() : bIsCopy(false), bIsPickup(false) {
 	
 }
 

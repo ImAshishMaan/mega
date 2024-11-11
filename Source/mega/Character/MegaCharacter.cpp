@@ -20,6 +20,7 @@
 #include "DrawDebugHelpers.h"
 #include "mega/HUD/MegaHUD.h"
 #include "mega/MegaComponents/InventoryComponent.h"
+#include "mega/World/ItemPickups.h"
 
 AMegaCharacter::AMegaCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -460,6 +461,26 @@ void AMegaCharacter::Interact() {
 void AMegaCharacter::UpdateInteractionWidget() const {
 	if(IsValid(TargetInteractable.GetObject())) {
 		MegaHUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+	}
+}
+
+void AMegaCharacter::DropItem(UItemBase* ItemToDrop, const int32 QuantityToDrop) {
+	if(PlayerInventoryComponent->FindMatchingItem(ItemToDrop)) {
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = this;
+		SpawnParameters.bNoFail = true;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		const FVector SpawnLocation{GetActorLocation() + GetActorForwardVector() * 100.0f};
+		const FTransform SpawnTransform{FTransform{GetActorRotation(), SpawnLocation}};
+
+		const int32 RemovedQuantity = PlayerInventoryComponent->RemoveAmountOfItem(ItemToDrop, QuantityToDrop);
+		AItemPickups* Pickup = GetWorld()->SpawnActor<AItemPickups>(AItemPickups::StaticClass(), SpawnTransform, SpawnParameters); // TODO: Why we used static class here think about it again (populate the spawned item with data from ??)
+		
+		Pickup->InitializeDrop(ItemToDrop, RemovedQuantity);
+		
+	} else {
+		UE_LOG(LogTemp, Warning, TEXT("No matching item in inventory to drop"));
 	}
 }
 
