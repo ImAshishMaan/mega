@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/Image.h"
 #include "InventoryItemSlot.generated.h"
 
 class UTextBlock;
@@ -10,6 +9,7 @@ class UInventoryTooltip;
 class UDragItemVisual;
 class UItemBase;
 class UBorder;
+class UImage;
 
 UCLASS()
 class MEGA_API UInventoryItemSlot : public UUserWidget {
@@ -30,13 +30,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot")
 	UItemBase* ItemReference;
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot")
+	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
 	UBorder* ItemBorder;
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot")
+	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
 	UImage* ItemIcon;
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot")
+	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
 	UTextBlock* ItemQuantity;
 
 	virtual void NativeOnInitialized() override;

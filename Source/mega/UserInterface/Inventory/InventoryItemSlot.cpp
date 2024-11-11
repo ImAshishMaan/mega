@@ -1,6 +1,7 @@
 #include "InventoryItemSlot.h"
 #include "InventoryTooltip.h"
 #include "Components/Border.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "mega/Items/ItemBase.h"
 

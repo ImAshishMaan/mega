@@ -6,9 +6,7 @@
 
 class UTextBlock;
 class UInventoryItemSlot;
-/**
- * 
- */
+
 UCLASS()
 class MEGA_API UInventoryTooltip : public UUserWidget {
 	GENERATED_BODY()
@@ -38,9 +36,6 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* MaxStackSize;
-
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* SellValue;
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* StackWeight;
