@@ -36,7 +36,7 @@ void UInventoryItemSlot::NativeConstruct() {
 		case EItemQuality::Grandmaster:
 			ItemBorder->SetBrushColor(FLinearColor(1.0f, 0.45f, 0.0f)); // orange
 			break;
-			default: ;
+		default: ;
 		}
 
 		// Set Item Icon
@@ -72,7 +72,9 @@ void UInventoryItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const
 		UDragItemVisual* DragVisual = CreateWidget<UDragItemVisual>(this, DragVisualClass);
 		DragVisual->ItemIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
 		DragVisual->ItemBorder->SetBrushColor(ItemBorder->GetBrushColor());
-		DragVisual->ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity));
+		ItemReference->ItemNumericData.bIsStackable
+			? DragVisual->ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity))
+			: DragVisual->ItemQuantity->SetVisibility(ESlateVisibility::Collapsed);
 
 		UItemDragDropOperation* DragItemOperation = NewObject<UItemDragDropOperation>(this, UItemDragDropOperation::StaticClass());
 		DragItemOperation->SourceItem = ItemReference;
@@ -82,7 +84,6 @@ void UInventoryItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const
 		DragItemOperation->Pivot = EDragPivot::TopLeft;
 
 		OutOperation = DragItemOperation;
-		
 	}
 }
 

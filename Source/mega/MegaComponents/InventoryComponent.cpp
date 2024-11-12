@@ -92,11 +92,74 @@ FItemAddResult UInventoryComponent::HandleNonStackableItems(UItemBase* InputItem
 
 	AddNewItem(InputItem, 1);
 	return FItemAddResult::AddedAll(1, FText::Format(FText::FromString("Successfully added {0} {1} to inventory."), 1, InputItem->ItemTextData.Name));
-	
 }
 
-int32 UInventoryComponent::HandleStackableItems(UItemBase* InputItem, int32 RequestedAddAmount) {
-	return 0; 
+int32 UInventoryComponent::HandleStackableItems(UItemBase* ItemIn, int32 RequestedAddAmount) {
+	if(RequestedAddAmount <= 0 || FMath::IsNearlyZero(ItemIn->GetItemStackWeight())) {
+		// Invalid item data
+		return 0;
+	}
+
+	int32 AmountToDistribute = RequestedAddAmount;
+
+	// check if item is already in inventory
+	UItemBase* ExistingItemStack = FindNextPartialStack(ItemIn);
+
+	// distribute item stack over existing stacks
+	while(ExistingItemStack) {
+		const int32 AmountToMakeFullStack = CalculateNumberForFullStack(ExistingItemStack, AmountToDistribute);
+		const int32 WeightLimitAddAmount = CalculateWeightAddAmount(ExistingItemStack, AmountToMakeFullStack);
+
+		// adding partially to an existing stack
+		if(WeightLimitAddAmount > 0) {
+			ExistingItemStack->SetQuantity(ExistingItemStack->Quantity + WeightLimitAddAmount);
+			InventoryTotalWeight += WeightLimitAddAmount * ExistingItemStack->GetItemSingleWeight();
+
+			AmountToDistribute -= WeightLimitAddAmount;
+
+			ItemIn->SetQuantity(AmountToDistribute);
+
+			// TODO: Refine this logic since going over weight capacity should not ever be possible
+			if(InventoryTotalWeight >= GetWeightCapacity()) {
+				OnInventoryUpdated.Broadcast();
+				return RequestedAddAmount - AmountToDistribute;
+			}
+		} else if(WeightLimitAddAmount <= 0) {
+			if(AmountToDistribute != RequestedAddAmount) {
+				OnInventoryUpdated.Broadcast();
+				return RequestedAddAmount - AmountToDistribute;
+			}
+
+			return 0;
+		}
+
+		// added everything
+		if(AmountToDistribute <= 0) {
+			OnInventoryUpdated.Broadcast();
+			return RequestedAddAmount;
+		}
+
+		ExistingItemStack = FindNextPartialStack(ExistingItemStack);
+	}
+
+	// no more partial stacks found, check if a new stack can be created
+	if(InventoryContents.Num() + 1 <= InventorySlotsCapacity) {
+		const int32 WeightLimitAddAmount = CalculateWeightAddAmount(ItemIn, AmountToDistribute);
+		if(WeightLimitAddAmount > 0) {
+			if(WeightLimitAddAmount < AmountToDistribute) {
+				AmountToDistribute -= WeightLimitAddAmount;
+				ItemIn->SetQuantity(AmountToDistribute);
+				AddNewItem(ItemIn->CreateItemCopy(), WeightLimitAddAmount);
+				return RequestedAddAmount - AmountToDistribute;
+			}
+
+			AddNewItem(ItemIn, WeightLimitAddAmount);
+			return RequestedAddAmount;
+		}
+	}
+
+	OnInventoryUpdated.Broadcast();
+	return RequestedAddAmount - AmountToDistribute;
 }
 
 FItemAddResult UInventoryComponent::HandleAddItem(UItemBase* InputItem) {
@@ -127,10 +190,11 @@ FItemAddResult UInventoryComponent::HandleAddItem(UItemBase* InputItem) {
 
 void UInventoryComponent::AddNewItem(UItemBase* Item, const int32 AmountToAdd) {
 	UItemBase* NewItem;
-	if(Item->bIsCopy || Item->bIsPickup || true) { // TODO: FIX:: Data is getting lost here if we go to else state
+	if(Item->bIsCopy || Item->bIsPickup || true) {
+		// TODO: FIX:: Data is getting lost here if we go to else state
 		// if item is already a copy, or is a world pickup
 		NewItem = Item;
-		NewItem->ResetItemFlags();
+		//NewItem->ResetItemFlags();
 	} else {
 		// used when splitting or dragging to/from inventory
 		NewItem = Item->CreateItemCopy();

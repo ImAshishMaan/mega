@@ -38,7 +38,7 @@ void UInventoryTooltip::NativeConstruct() {
 	ArmorRating->SetText(FText::AsNumber(ItemBeingHovered->ItemStatisticsData.ArmorRating));
 	UsageText->SetText(ItemBeingHovered->ItemTextData.UsageText);
 	ItemDescription->SetText(ItemBeingHovered->ItemTextData.Description);
-	StackWeight->SetText(FText::FromString("Weight: " + FString::SanitizeFloat(ItemBeingHovered->GetItemSingleWeight())));
+	StackWeight->SetText(FText::FromString("Weight: " + FString::SanitizeFloat(ItemBeingHovered->GetItemStackWeight())));
 
 	if(ItemBeingHovered->ItemNumericData.bIsStackable) {
 		MaxStackSize->SetText(FText::FromString("Max stack size: " + FString::FromInt(ItemBeingHovered->ItemNumericData.MaxStackSize)));
