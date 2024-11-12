@@ -2,6 +2,15 @@
 #include "CharacterOverlayWidget.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
+#include "Engine/Texture2D.h"
+#include "mega/UserInterface/MainMenu.h"
+#include "mega/UserInterface/Interaction/InteractionWidget.h"
+
+AMegaHUD::AMegaHUD() {
+	
+}
 
 void AMegaHUD::BeginPlay() {
 	Super::BeginPlay();
@@ -20,6 +29,67 @@ void AMegaHUD::InitOverlays() {
 		if(CharacterOverlayClass && CharacterOverlay == nullptr) {
 			CharacterOverlay = CreateWidget<UCharacterOverlayWidget>(PlayerController, CharacterOverlayClass);
 		}
+	}
+
+	if(MainMenuClass) {
+		MainMenuWidget = CreateWidget<UMainMenu>(GetWorld(), MainMenuClass);
+		MainMenuWidget->AddToViewport(5);
+		MainMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	
+	if(InteractionWidgetClass) {
+		InteractionWidget = CreateWidget<UInteractionWidget>(GetWorld(), InteractionWidgetClass);
+		InteractionWidget->AddToViewport(-1);
+		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void AMegaHUD::DisplayMenu() {
+	if(MainMenuWidget) {
+		bIsMenuVisible = true;
+		MainMenuWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+void AMegaHUD::HideMenu() {
+	if(MainMenuWidget) {
+		bIsMenuVisible = false;
+		MainMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void AMegaHUD::ToggleMenu() {
+	if(bIsMenuVisible) {
+		HideMenu();
+
+		const FInputModeGameOnly InputModeGameOnly;
+		GetOwningPlayerController()->SetInputMode(InputModeGameOnly);
+		GetOwningPlayerController()->SetShowMouseCursor(false);
+	} else {
+		DisplayMenu();
+
+		const FInputModeGameAndUI InputModeGameOnly;
+		GetOwningPlayerController()->SetInputMode(InputModeGameOnly);
+		GetOwningPlayerController()->SetShowMouseCursor(true);
+	}
+}
+
+void AMegaHUD::ShowInteractionWidget() {
+	if(InteractionWidget) {
+		InteractionWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+void AMegaHUD::HideInteractionWidget() {
+	if(InteractionWidget) {
+		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+void AMegaHUD::UpdateInteractionWidget(const FInteractableData* InteractableData) {
+	if(InteractionWidget) {
+		if(InteractionWidget->GetVisibility() == ESlateVisibility::Collapsed) {
+			InteractionWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+
+		InteractionWidget->UpdateWidget(InteractableData);
 	}
 }
 

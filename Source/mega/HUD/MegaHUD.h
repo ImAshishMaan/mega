@@ -6,6 +6,9 @@
 #include "mega/Enums.h"
 #include "MegaHUD.generated.h"
 
+class UInteractionWidget;
+class UMainMenu;
+struct FInteractableData;
 class UCharacterOverlayWidget;
 class UTexture2D;
 class UUserWidget;
@@ -69,10 +72,35 @@ public:
 	UTexture2D* CrosshairsBottom = nullptr;
 
 	/*
-	 * 
+	 *  Inventory 
 	 */
+	UPROPERTY(EditAnywhere, Category = "Widgets")
+	TSubclassOf<UMainMenu> MainMenuClass;
+	
+	UPROPERTY(EditAnywhere, Category = "Widgets")
+	TSubclassOf<UInteractionWidget> InteractionWidgetClass;
+
+	bool bIsMenuVisible;
+
+
+	AMegaHUD();
+
+	void DisplayMenu();
+	void HideMenu();
+	void ToggleMenu();
+
+	void ShowInteractionWidget();
+	void HideInteractionWidget();
+	void UpdateInteractionWidget(const FInteractableData* InteractableData);
+	
 protected:
 	virtual void BeginPlay() override;
+
+	UPROPERTY()
+	UMainMenu* MainMenuWidget;
+
+	UPROPERTY()
+	UInteractionWidget* InteractionWidget;
 
 private:
 	FHUDPackage HUDPackage;

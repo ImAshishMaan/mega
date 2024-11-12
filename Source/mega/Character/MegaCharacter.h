@@ -1,15 +1,35 @@
 #pragma once
 
 #include <string>
-
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
 #include "CoreMinimal.h"
+#include "TimerManager.h"
 #include "mega/MegaComponents/CombatComponent.h"
 #include "MegaCharacter.generated.h"
 
+class UItemBase;
+class UInventoryComponent;
+
+USTRUCT()
+struct FInteractionData {
+	GENERATED_USTRUCT_BODY()
+
+	FInteractionData() : 
+	CurrentInteractable(nullptr),
+	LastInteractionCheckTime(0.0f)
+	{};
+
+	UPROPERTY()
+	AActor* CurrentInteractable;
+
+	UPROPERTY()
+	float LastInteractionCheckTime;
+};
+
+class IInteractionInterface;
 class UActionComponent;
 class UAbilityComponent;
 class UAttributeComponent;
@@ -76,6 +96,12 @@ public:
 	UInputAction* TransformButtonAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* InteractionButtonAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ToggleInventoryMenuAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	void AddMappingContext();
@@ -98,12 +124,46 @@ public:
 	void ChangePOVButtonPressed();
 	void QAbilityButtonPressed();
 	void TransformButtonPressed();
+	void InteractionButtonPressed();
+	void InteractionButtonReleased();
+	void ToggleInventoryMenuPressed(); // TODO: may be move it to controller class !!
+
+
+	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); }
+	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventoryComponent; }
+
+	void UpdateInteractionWidget() const;
+
+	void DropItem(UItemBase* ItemToDrop, const int32 QuantityToDrop);
 
 protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UAttributeComponent* OwningComp, float NewHealth, float MaxHealth, float Damage);
+
+	UPROPERTY()
+	AMegaHUD* MegaHUD;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Character | Interactable")
+	TScriptInterface<IInteractionInterface> TargetInteractable;
+
+	float InteractionCheckFrequency = 0.1f;
+
+	float InteractionCheckDistance = 1000.0f;
+
+	FTimerHandle TimerHandle_Interaction;
+
+	FInteractionData InteractionData;
+
+	// Functions
+
+	void PerformInteractionCheck();
+	void FoundInteractable(AActor* NewInteractable);
+	void NoInteractableFound();
+	void BeginInteract();
+	void EndInteract();
+	void Interact();
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -129,6 +189,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UActionComponent* ActionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UInventoryComponent* PlayerInventoryComponent;
 
 	UPROPERTY()
 	AWeapon* OverlappingWeapon;
