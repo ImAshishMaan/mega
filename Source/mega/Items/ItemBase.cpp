@@ -12,6 +12,7 @@ void UItemBase::ResetItemFlags() {
 
 UItemBase* UItemBase::CreateItemCopy() const {
 	UItemBase* ItemCopy = NewObject<UItemBase>(StaticClass());
+	
 	ItemCopy->ID = this->ID;
 	ItemCopy->Quantity = this->Quantity;
 	ItemCopy->ItemQuality = this->ItemQuality;
@@ -19,6 +20,7 @@ UItemBase* UItemBase::CreateItemCopy() const {
 	ItemCopy->ItemNumericData = this->ItemNumericData;
 	ItemCopy->ItemStatisticsData = this->ItemStatisticsData;
 	ItemCopy->ItemAssetData = this->ItemAssetData;
+
 	ItemCopy->bIsCopy = true;
 
 	return ItemCopy;

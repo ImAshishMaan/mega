@@ -102,25 +102,21 @@ int32 UInventoryComponent::HandleStackableItems(UItemBase* ItemIn, int32 Request
 
 	int32 AmountToDistribute = RequestedAddAmount;
 
-	// check if item is already in inventory
 	UItemBase* ExistingItemStack = FindNextPartialStack(ItemIn);
 
-	// distribute item stack over existing stacks
 	while(ExistingItemStack) {
 		const int32 AmountToMakeFullStack = CalculateNumberForFullStack(ExistingItemStack, AmountToDistribute);
 		const int32 WeightLimitAddAmount = CalculateWeightAddAmount(ExistingItemStack, AmountToMakeFullStack);
 
-		// adding partially to an existing stack
 		if(WeightLimitAddAmount > 0) {
 			ExistingItemStack->SetQuantity(ExistingItemStack->Quantity + WeightLimitAddAmount);
-			InventoryTotalWeight += WeightLimitAddAmount * ExistingItemStack->GetItemSingleWeight();
+			InventoryTotalWeight += (ExistingItemStack->GetItemSingleWeight() * WeightLimitAddAmount);
 
 			AmountToDistribute -= WeightLimitAddAmount;
 
 			ItemIn->SetQuantity(AmountToDistribute);
 
-			// TODO: Refine this logic since going over weight capacity should not ever be possible
-			if(InventoryTotalWeight >= GetWeightCapacity()) {
+			if(InventoryTotalWeight + ExistingItemStack->GetItemSingleWeight() > InventoryWeightCapacity) {
 				OnInventoryUpdated.Broadcast();
 				return RequestedAddAmount - AmountToDistribute;
 			}
@@ -133,33 +129,34 @@ int32 UInventoryComponent::HandleStackableItems(UItemBase* ItemIn, int32 Request
 			return 0;
 		}
 
-		// added everything
 		if(AmountToDistribute <= 0) {
 			OnInventoryUpdated.Broadcast();
 			return RequestedAddAmount;
 		}
 
-		ExistingItemStack = FindNextPartialStack(ExistingItemStack);
+		ExistingItemStack = FindNextPartialStack(ItemIn);
 	}
 
-	// no more partial stacks found, check if a new stack can be created
 	if(InventoryContents.Num() + 1 <= InventorySlotsCapacity) {
 		const int32 WeightLimitAddAmount = CalculateWeightAddAmount(ItemIn, AmountToDistribute);
+
 		if(WeightLimitAddAmount > 0) {
 			if(WeightLimitAddAmount < AmountToDistribute) {
 				AmountToDistribute -= WeightLimitAddAmount;
 				ItemIn->SetQuantity(AmountToDistribute);
+
 				AddNewItem(ItemIn->CreateItemCopy(), WeightLimitAddAmount);
 				return RequestedAddAmount - AmountToDistribute;
 			}
 
-			AddNewItem(ItemIn, WeightLimitAddAmount);
+			AddNewItem(ItemIn, AmountToDistribute);
 			return RequestedAddAmount;
 		}
+
+		return RequestedAddAmount - AmountToDistribute;
 	}
 
-	OnInventoryUpdated.Broadcast();
-	return RequestedAddAmount - AmountToDistribute;
+	return 0;
 }
 
 FItemAddResult UInventoryComponent::HandleAddItem(UItemBase* InputItem) {
