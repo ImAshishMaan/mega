@@ -100,6 +100,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* ToggleInventoryMenuAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* DashAbilityAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
@@ -123,6 +126,7 @@ public:
 	void SecondaryWeaponButtonPressed();
 	void ChangePOVButtonPressed();
 	void QAbilityButtonPressed();
+	void DashAbilityButtonPressed();
 	void TransformButtonPressed();
 	void InteractionButtonPressed();
 	void InteractionButtonReleased();
