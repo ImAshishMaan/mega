@@ -98,6 +98,8 @@ void AMegaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(SecondaryWeaponAction, ETriggerEvent::Triggered, this, &AMegaCharacter::SecondaryWeaponButtonPressed);
 		EnhancedInputComponent->BindAction(ChangePOVAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ChangePOVButtonPressed);
 		EnhancedInputComponent->BindAction(QAbilityAction, ETriggerEvent::Triggered, this, &AMegaCharacter::QAbilityButtonPressed);
+		EnhancedInputComponent->BindAction(DashAbilityAction, ETriggerEvent::Triggered, this, &AMegaCharacter::DashAbilityButtonPressed);
+		
 		EnhancedInputComponent->BindAction(InteractionButtonAction, ETriggerEvent::Triggered, this, &AMegaCharacter::InteractionButtonPressed);
 		EnhancedInputComponent->BindAction(InteractionButtonAction, ETriggerEvent::Completed, this, &AMegaCharacter::InteractionButtonReleased);
 		EnhancedInputComponent->BindAction(ToggleInventoryMenuAction, ETriggerEvent::Triggered, this, &AMegaCharacter::ToggleInventoryMenuPressed);
@@ -272,6 +274,12 @@ void AMegaCharacter::ChangePOVButtonPressed() {
 void AMegaCharacter::QAbilityButtonPressed() {
 	if(ActionComponent) {
 		ActionComponent->StartActionByName(this, "MagicProjectile");
+	}
+}
+
+void AMegaCharacter::DashAbilityButtonPressed() {
+	if(ActionComponent) {
+		ActionComponent->StartActionByName(this, "DashAbility");
 	}
 }
 
