@@ -17,7 +17,7 @@ public:
 
 	FTimerHandle FillTimerHandle;
 	float ElapsedTime;
-	const float Duration = 4.0f;
+	float CoolDownTime;
 
 	void UpdateArcAnimateFill();
 

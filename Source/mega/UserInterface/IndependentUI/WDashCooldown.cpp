@@ -26,7 +26,7 @@ void UWDashCooldown::UpdateArcAnimateFill() {
 		if(MaterialInstance) {
 			ElapsedTime += 0.01f;
 
-			float FillValue = FMath::Clamp(ElapsedTime / Duration, 0.0f, 1.0f);
+			float FillValue = FMath::Clamp(ElapsedTime / CoolDownTime, 0.0f, 1.0f);
 			MaterialInstance->SetScalarParameterValue(FName("AnimateArcFill"), FillValue);
 
 			if(FillValue >= 1.0f) {

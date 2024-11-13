@@ -31,8 +31,9 @@ void UAction_DashAbility::StartAction_Implementation(AActor* Instigator) {
 	Delegate.BindUFunction(this, "AbilityCoolDown_Elapsed", Instigator);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_AttackDelay, Delegate, AbilityCoolDownTime, false);
 
-	if(DashCooldownClass) {
-		DashCooldownWidget = CreateWidget<UWDashCooldown>(GetWorld(), DashCooldownClass);
+	if(DashCooldownWidgetClass) {
+		DashCooldownWidget = CreateWidget<UWDashCooldown>(GetWorld(), DashCooldownWidgetClass);
+		DashCooldownWidget->CoolDownTime = AbilityCoolDownTime;
 		DashCooldownWidget->AddToViewport();
 	}
 }

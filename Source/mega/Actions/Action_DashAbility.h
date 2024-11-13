@@ -26,7 +26,7 @@ protected:
 	UAnimMontage* DashRightAnim;
 
 	UPROPERTY(EditAnywhere, Category = "Dash Ability")
-	TSubclassOf<UUserWidget> DashCooldownClass;
+	TSubclassOf<UUserWidget> DashCooldownWidgetClass;
 
 	UPROPERTY()
 	UWDashCooldown* DashCooldownWidget;
