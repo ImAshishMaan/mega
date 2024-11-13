@@ -1,7 +1,9 @@
 #include "Action_DashAbility.h"
+#include "Blueprint/UserWidget.h"
 #include "GameFramework/Character.h"
 #include "mega/Anim/MegaAnimInstance.h"
 #include "mega/Character/MegaCharacter.h"
+#include "mega/UserInterface/IndependentUI/WDashCooldown.h"
 
 void UAction_DashAbility::StartAction_Implementation(AActor* Instigator) {
 	Super::StartAction_Implementation(Instigator);
@@ -28,8 +30,15 @@ void UAction_DashAbility::StartAction_Implementation(AActor* Instigator) {
 	FTimerDelegate Delegate;
 	Delegate.BindUFunction(this, "AbilityCoolDown_Elapsed", Instigator);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_AttackDelay, Delegate, AbilityCoolDownTime, false);
+
+	if(DashCooldownClass) {
+		DashCooldownWidget = CreateWidget<UWDashCooldown>(GetWorld(), DashCooldownClass);
+		DashCooldownWidget->AddToViewport();
+	}
 }
 
 void UAction_DashAbility::AbilityCoolDown_Elapsed(AActor* Instigator) {
+	DashCooldownWidget->RemoveFromParent();
+	DashCooldownWidget = nullptr; // garbage collection 
 	StopAction(Instigator);
 }

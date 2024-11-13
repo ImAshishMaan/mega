@@ -5,6 +5,8 @@
 #include "Action_DashAbility.generated.h"
 
 
+class UWDashCooldown;
+
 UCLASS()
 class MEGA_API UAction_DashAbility : public UMAction {
 	GENERATED_BODY()
@@ -22,6 +24,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Dash Ability")
 	UAnimMontage* DashRightAnim;
+
+	UPROPERTY(EditAnywhere, Category = "Dash Ability")
+	TSubclassOf<UUserWidget> DashCooldownClass;
+
+	UPROPERTY()
+	UWDashCooldown* DashCooldownWidget;
 
 	UPROPERTY(EditAnywhere, Category = "Dash Ability")
 	float AbilityCoolDownTime;
