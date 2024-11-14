@@ -1,5 +1,5 @@
 #include "MegaHUD.h"
-#include "CharacterOverlayWidget.h"
+#include "CharacterHealthWidget.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "Engine/Engine.h"
@@ -27,7 +27,7 @@ void AMegaHUD::InitOverlays() {
 	APlayerController* PlayerController = GetOwningPlayerController();
 	if(PlayerController) {
 		if(CharacterOverlayClass && CharacterOverlay == nullptr) {
-			CharacterOverlay = CreateWidget<UCharacterOverlayWidget>(PlayerController, CharacterOverlayClass);
+			CharacterOverlay = CreateWidget<UCharacterHealthWidget>(PlayerController, CharacterOverlayClass);
 		}
 	}
 
