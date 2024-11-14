@@ -1,8 +1,7 @@
 #include "MegaPlayerController.h"
 #include "EnhancedInputComponent.h"
-#include "Components/ProgressBar.h"
 #include "mega/Anim/MegaAnimInstance.h"
-#include "mega/HUD/CharacterOverlayWidget.h"
+#include "mega/HUD/CharacterHealthWidget.h"
 #include "mega/HUD/MegaHUD.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -66,10 +65,9 @@ void AMegaPlayerController::TogglePausePressed() {
 
 void AMegaPlayerController::SetHUDHealth(float Health, float MaxHealth) {
 	MegaHUD = MegaHUD == nullptr ? Cast<AMegaHUD>(GetHUD()) : MegaHUD;
-	bool bHUDValid = MegaHUD && MegaHUD->CharacterOverlay && MegaHUD->CharacterOverlay->HealthBar;
+	bool bHUDValid = MegaHUD && MegaHUD->CharacterOverlay;
 
 	if(bHUDValid) {
-		const float HealthPercent = Health / MaxHealth;
-		MegaHUD->CharacterOverlay->HealthBar->SetPercent(HealthPercent);
+		MegaHUD->CharacterOverlay->SetHealth(Health, MaxHealth);
 	}
 }

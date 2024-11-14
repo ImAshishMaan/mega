@@ -9,7 +9,7 @@
 class UInteractionWidget;
 class UMainMenu;
 struct FInteractableData;
-class UCharacterOverlayWidget;
+class UCharacterHealthWidget;
 class UTexture2D;
 class UUserWidget;
 
@@ -32,7 +32,7 @@ public:
 	TSubclassOf<UUserWidget> CharacterOverlayClass;
 
 	UPROPERTY()
-	UCharacterOverlayWidget* CharacterOverlay;
+	UCharacterHealthWidget* CharacterOverlay;
 
 	/*
 	 * UI setttings
