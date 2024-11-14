@@ -9,7 +9,6 @@ void UCharacterHealthWidget::NativeConstruct() {
 
 void UCharacterHealthWidget::InitializeHealthMaterial() {
 	if (HealthMaterialImage && HealthMaterialImage->GetBrush().GetResourceObject()) {
-		// Create a dynamic material instance from the existing material
 		UMaterialInterface* BaseMaterial =  Cast<UMaterialInterface>(HealthMaterialImage->GetBrush().GetResourceObject());
 		DynamicHealthMaterial = UMaterialInstanceDynamic::Create(BaseMaterial, this);
 

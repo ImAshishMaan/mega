@@ -26,6 +26,7 @@ protected:
 protected:
 
 private:
+	UPROPERTY()
 	UMaterialInstanceDynamic* DynamicHealthMaterial;
 
 	// Initialize the dynamic material
