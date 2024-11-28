@@ -1,6 +1,6 @@
 # mega
 
-NOTE: Everything is in C++.
+NOTE: Everything is in C++. And this doesn't contain any environment.
 
 This is a comprehensive learning project designed to enhance my skills in Unreal Engine game development. The project features a wide array of mechanics and systems, each built with extensibility and performance in mind.
 
