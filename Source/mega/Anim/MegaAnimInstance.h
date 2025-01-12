@@ -58,6 +58,9 @@ public:
 	bool IsStateChanged;
 
 	void SetCharacterStates();
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "State")
+	float HoldingTorch = 0.0f;
 
 	/*
 	 * Acceleration Data
